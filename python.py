@@ -579,6 +579,190 @@ def vaciar_carrito():
 
 
 # =========================
+# AGREGAR PRODUCTO
+# =========================
+
+# Firmas (primeros bytes) de los formatos de imagen permitidos.
+# Así se revisa el contenido real del archivo y no solo su extensión.
+FIRMAS_IMAGEN = [
+    (b"\xff\xd8\xff", "image/jpeg"),
+    (b"\x89PNG\r\n\x1a\n", "image/png"),
+    (b"GIF87a", "image/gif"),
+    (b"GIF89a", "image/gif"),
+]
+
+
+def detectar_tipo_imagen(datos):
+    """Regresa el tipo MIME de la imagen o None si no es una imagen permitida."""
+
+    for firma, tipo in FIRMAS_IMAGEN:
+        if datos.startswith(firma):
+            return tipo
+
+    # WEBP: empieza con RIFF y en el byte 8 dice WEBP
+    if datos[:4] == b"RIFF" and datos[8:12] == b"WEBP":
+        return "image/webp"
+
+    return None
+
+
+def obtener_categorias():
+
+    cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute("SELECT id, nombre FROM categorias ORDER BY nombre")
+
+    categorias = cursor.fetchall()
+
+    cursor.close()
+
+    return categorias
+
+
+@app.route("/productos/agregar", methods=["GET", "POST"])
+def agregar_producto():
+
+    try:
+        categorias = obtener_categorias()
+
+    except MySQLdb.Error as error:
+        print("Error al cargar categorías:", error)
+
+        flash("No se pudo conectar con la base de datos.", "error")
+
+        return redirect(url_for("catalogo"))
+
+    if request.method == "POST":
+
+        nombre = request.form.get("nombre", "").strip()
+        marca = request.form.get("marca", "").strip()
+        descripcion = request.form.get("descripcion", "").strip()
+        precio_texto = request.form.get("precio", "").strip()
+        stock_texto = request.form.get("stock", "").strip()
+        categoria_texto = request.form.get("categoria_id", "").strip()
+        archivo = request.files.get("imagen")
+
+        errores = []
+
+        # Validar textos
+        if not nombre or len(nombre) > 100:
+            errores.append("El nombre es obligatorio (máximo 100 caracteres).")
+
+        if not marca or len(marca) > 60:
+            errores.append("La marca es obligatoria (máximo 60 caracteres).")
+
+        # Validar precio
+        try:
+            precio = round(float(precio_texto), 2)
+
+            if precio < 0 or precio > 99999999.99:
+                raise ValueError
+
+        except ValueError:
+            errores.append("El precio debe ser un número mayor o igual a 0.")
+
+        # Validar stock
+        try:
+            stock = int(stock_texto)
+
+            if stock < 0:
+                raise ValueError
+
+        except ValueError:
+            errores.append("El stock debe ser un número entero mayor o igual a 0.")
+
+        # Validar categoría (que exista en la BD)
+        ids_categorias = {str(categoria["id"]) for categoria in categorias}
+
+        if categoria_texto not in ids_categorias:
+            errores.append("Selecciona una categoría válida.")
+
+        # Validar imagen (opcional)
+        imagen = None
+        imagen_tipo = None
+
+        if archivo and archivo.filename:
+
+            imagen = archivo.read()
+            imagen_tipo = detectar_tipo_imagen(imagen)
+
+            if not imagen_tipo:
+                errores.append("La imagen debe ser JPG, PNG, GIF o WEBP.")
+
+        if errores:
+
+            for error in errores:
+                flash(error, "error")
+
+            return render_template(
+                "agregar_producto.html",
+                categorias=categorias,
+                datos=request.form
+            )
+
+        # Guardar producto en MariaDB
+        try:
+            cursor = database.connection.cursor()
+
+            cursor.execute(
+                """
+                INSERT INTO productos
+                    (nombre, marca, descripcion, precio, stock,
+                     imagen, imagen_tipo, categoria_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """,
+                (
+                    nombre,
+                    marca,
+                    descripcion or None,
+                    precio,
+                    stock,
+                    imagen,
+                    imagen_tipo,
+                    int(categoria_texto)
+                )
+            )
+
+            nuevo_id = cursor.lastrowid
+
+            database.connection.commit()
+
+            cursor.close()
+
+        except MySQLdb.Error as error:
+            database.connection.rollback()
+
+            print("Error al guardar el producto:", error)
+
+            flash("No se pudo guardar el producto. Intenta de nuevo.", "error")
+
+            return render_template(
+                "agregar_producto.html",
+                categorias=categorias,
+                datos=request.form
+            )
+
+        flash(f"Producto \"{nombre}\" agregado correctamente.", "exito")
+
+        return redirect(url_for("producto", producto_id=nuevo_id))
+
+    return render_template(
+        "agregar_producto.html",
+        categorias=categorias,
+        datos={}
+    )
+
+
+# Si suben un archivo más grande que MAX_CONTENT_LENGTH
+@app.errorhandler(413)
+def archivo_muy_grande(error):
+
+    flash("La imagen es muy grande. El máximo es 2 MB.", "error")
+
+    return redirect(url_for("agregar_producto"))
+
+
+# =========================
 # SERVIDOR
 # =========================
 
