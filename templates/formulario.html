@@ -1,102 +1,74 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "plantilla.html" %}
 
-<head>
+{% block titulo %}Registrarse - Moon-cars{% endblock %}
 
-    <meta charset="UTF-8">
+{% block contenido %}
 
-    <title>Registrarse - Moon-cars MX</title>
+    <!-- REGISTRO -->
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <div class="formulario">
 
-</head>
+        <h2>Crear cuenta</h2>
 
-<body>
-
-<header>
-
-    <h1>Moon-cars</h1>
-
-</header>
+        {% if mensaje %}
+            <p class="aviso aviso-error">{{ mensaje }}</p>
+        {% endif %}
 
 
-<nav>
+        <form method="POST" id="formRegistro">
 
-    <ul>
+            <label>Nombre completo:</label>
 
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/contacto">Contacto</a></li>
+            <input
+                type="text"
+                name="nombre"
+                id="nombre"
+                required
+                maxlength="100"
+            >
 
-    </ul>
+            <label>Correo electrónico:</label>
 
-</nav>
+            <input
+                type="email"
+                name="correo"
+                id="correo"
+                required
+                maxlength="150"
+            >
+
+            <label>Contraseña:</label>
+
+            <input
+                type="password"
+                name="password"
+                id="password"
+                required
+            >
+
+            <p>
+                La contraseña debe tener mínimo 8 caracteres,
+                una mayúscula, una minúscula, un número
+                y un carácter especial.
+            </p>
 
 
-<div class="formulario">
+            <button type="submit">
+                Registrarme
+            </button>
 
-    <h2>Crear cuenta</h2>
+        </form>
 
-    {% if mensaje %}
-        <p class="mensaje">{{ mensaje }}</p>
-    {% endif %}
-
-
-    <form method="POST" id="formRegistro">
-
-        <label>Nombre completo:</label>
-
-        <input
-            type="text"
-            name="nombre"
-            id="nombre"
-            required
-            maxlength="100"
-        >
-
-        <label>Correo electrónico:</label>
-
-        <input
-            type="email"
-            name="correo"
-            id="correo"
-            required
-            maxlength="150"
-        >
-
-        <label>Contraseña:</label>
-
-        <input
-            type="password"
-            name="password"
-            id="password"
-            required
-        >
 
         <p>
-            La contraseña debe tener mínimo 8 caracteres,
-            una mayúscula, una minúscula, un número
-            y un carácter especial.
+            ¿Ya tienes una cuenta?
         </p>
 
+        <a href="/login">
+            Iniciar sesión
+        </a>
 
-        <button type="submit">
-            Registrarme
-        </button>
-
-    </form>
-
-
-    <p>
-        ¿Ya tienes una cuenta?
-    </p>
-
-    <a href="/login">
-        Iniciar sesión
-    </a>
-
-</div>
+    </div>
 
 
 <script>
@@ -160,7 +132,4 @@ document.getElementById("formRegistro").addEventListener("submit", function(even
 
 </script>
 
-
-</body>
-
-</html>
+{% endblock %}

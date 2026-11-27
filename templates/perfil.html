@@ -1,67 +1,49 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "plantilla.html" %}
 
-<head>
+{% block titulo %}Perfil - Moon-cars{% endblock %}
 
-    <meta charset="UTF-8">
+{% block contenido %}
 
-    <title>Perfil - Moon-cars</title>
+    <!-- PERFIL -->
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <div class="perfil">
 
-</head>
+        <h2>Mi Perfil</h2>
 
-<body>
-
-<header>
-
-    <h1>Moon-cars </h1>
-
-</header>
-
-
-<nav>
-
-    <ul>
-
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/contacto">Contacto</a></li>
-        <li><a href="/login">Login</a></li>
-
-    </ul>
-
-</nav>
-
-
-<div class="perfil">
-
-    <h2>Mi Perfil</h2>
-
-
-    {% if usuario %}
 
         <h3>{{ usuario.nombre }}</h3>
+
+        <span class="etiqueta etiqueta-rol">{{ usuario.rol }}</span>
 
         <p>
             Correo: {{ usuario.correo }}
         </p>
 
-    {% else %}
-
         <p>
-            No has iniciado sesión.
+            Miembro desde: {{ usuario.fecha_registro.strftime('%d/%m/%Y') }}
         </p>
 
-        <a href="/login">
-            Iniciar sesión
-        </a>
 
-    {% endif %}
+        <!-- OPCIONES SEGÚN EL ROL -->
 
-</div>
+        <div class="perfil-acciones">
 
+            <a href="{{ url_for('catalogo') }}" class="boton">
+                Ver catálogo
+            </a>
 
-</body>
+            {% if usuario.rol == "Administrador" %}
+                <a href="{{ url_for('agregar_producto') }}" class="boton">
+                    Agregar producto
+                </a>
+            {% endif %}
 
-</html>
+            <a href="{{ url_for('logout') }}" class="boton-eliminar">
+                Cerrar sesión
+            </a>
+
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -1,87 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "plantilla.html" %}
 
-<head>
+{% block titulo %}Moon-cars{% endblock %}
 
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Moon-cars</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
-</head>
-
-
-<body>
-
-    <!-- ENCABEZADO -->
-
-    <header>
-
-        <h1>Automóviles en venta y refacciones</h1>
-
-        <p>Moon-cars</p>
-
-    </header>
-
-
-    <!-- MENÚ -->
-
-    <nav>
-
-        <ul>
-
-            <li>
-                <a href="/">Inicio</a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('catalogo') }}">Catálogo</a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('catalogo', categoria=1) }}">Carros</a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('catalogo', categoria=2) }}">Refacciones</a>
-            </li>
-
-            <li>
-                <a href="/contacto">Contacto</a>
-            </li>
-
-            <li>
-                <a href="/login">Login</a>
-            </li>
-
-            <li>
-                <a href="/formulario">Registrarse</a>
-            </li>
-
-            <li>
-                <a href="/perfil">Perfil</a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('carrito') }}" class="enlace-carrito">
-                    Carrito
-                    <span class="contador-carrito">{{ cantidad_carrito }}</span>
-                </a>
-            </li>
-
-        </ul>
-
-    </nav>
-
-
-    <!-- CONTENIDO PRINCIPAL -->
-
-    <main>
-
+{% block contenido %}
 
         <!-- AUTOMÓVILES -->
 
@@ -229,21 +150,4 @@
 
         </section>
 
-
-    </main>
-
-
-    <!-- PIE DE PÁGINA -->
-
-    <footer>
-
-        <p>
-            © 2026 Moon-cars - Automóviles y Refacciones
-        </p>
-
-    </footer>
-
-
-</body>
-
-</html>
+{% endblock %}
