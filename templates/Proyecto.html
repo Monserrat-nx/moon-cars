@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Moon-cars</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+    <!-- ENCABEZADO -->
+
+    <header>
+
+        <h1>Automóviles en venta y refacciones</h1>
+
+        <p>Moon-cars</p>
+
+    </header>
+
+
+    <!-- MENÚ -->
+
+    <nav>
+
+        <ul>
+
+            <li>
+                <a href="/">Inicio</a>
+            </li>
+
+            <li>
+                <a href="/">Carros</a>
+            </li>
+
+            <li>
+                <a href="/">Refacciones</a>
+            </li>
+
+            <li>
+                <a href="/contacto">Contacto</a>
+            </li>
+
+            <li>
+                <a href="/login">Login</a>
+            </li>
+
+            <li>
+                <a href="/formulario">Registrarse</a>
+            </li>
+
+            <li>
+                <a href="/perfil">Perfil</a>
+            </li>
+
+        </ul>
+
+    </nav>
+
+
+    <!-- CONTENIDO PRINCIPAL -->
+
+    <main>
+
+
+        <!-- AUTOMÓVILES -->
+
+        <section class="introduccion">
+
+            <h2>Automóviles</h2>
+
+            <p>
+                
+                En esta pagina encuentra diferentes autos y refracciones originales en un buen precio. 
+                Llevamos mas de 5 años en el mercado, con la facilidad de tener el auto de tus sueños con incluso obtener esas piezas de tus autos que otros te han dicho que son dificiles.
+                Por que nosostros amamos los carros y con ese mismo amor te ayudamos.
+            </p>
+
+        </section>
+
+
+        <!-- CARROS -->
+
+        <section>
+
+            <h2>Carros Destacados</h2>
+
+
+            <table>
+
+                <tr>
+
+                    <th>Imagen</th>
+
+                    <th>Modelo</th>
+
+                    <th>Marca</th>
+
+                    <th>Precio</th>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+
+                        <img
+                            src="{{ url_for('static', filename='img/mustang.jpg') }}"
+                            width="180"
+                            alt="Mustang GT"
+                        >
+
+                    </td>
+
+                    <td>Mustang GT</td>
+
+                    <td>Ford</td>
+
+                    <td>$950,000</td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+
+                       <img src="{{ url_for('static', filename='img/jetta.jpg') }}" 
+                       width="180" 
+                       alt="Jetta GLI">
+
+                    </td>
+
+                    <td>Jetta GLI</td>
+
+                    <td>Volkswagen</td>
+
+                    <td>$620,000</td>
+
+                </tr>
+
+            </table>
+
+        </section>
+
+
+        <!-- REFACCIONES -->
+
+        <section>
+
+            <h2>Refacciones</h2>
+
+
+            <table>
+
+                <tr>
+
+                    <th>Imagen</th>
+
+                    <th>Producto</th>
+
+                    <th>Precio</th>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+
+                        <img
+                            src="{{ url_for('static', filename='img/aceite.jpg') }}"
+                            width="120"
+                            alt="Aceite sintético"
+                        >
+
+                    </td>
+
+                    <td>Aceite Sintético</td>
+
+                    <td>$550</td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>Llanta Michelin</td>
+
+                    <td>$3,200</td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td></td>
+
+                    <td>Batería LTH</td>
+
+                    <td>$2,100</td>
+
+                </tr>
+
+            </table>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- PIE DE PÁGINA -->
+
+    <footer>
+
+        <p>
+            © 2026 Moon-cars - Automóviles y Refacciones
+        </p>
+
+    </footer>
+
+
+</body>
+
+</html>

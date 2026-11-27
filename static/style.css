@@ -1,0 +1,613 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #101010;
+    color: #ffffff;
+    min-height: 100vh;
+}
+
+
+/* ================================
+   ENCABEZADO
+================================ */
+
+header {
+    background: linear-gradient(
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 0, 0.7)
+    ),
+    url("../img/fondo.jpg");
+
+    background-size: cover;
+    background-position: center;
+
+    text-align: center;
+
+    padding: 70px 20px;
+}
+
+header h1 {
+    font-size: 45px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+header p {
+    font-size: 18px;
+    color: #cccccc;
+}
+
+
+/* ================================
+   MENÚ
+================================ */
+
+nav {
+    background: #181818;
+    border-bottom: 2px solid #e00000;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+nav ul {
+    list-style: none;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+}
+
+nav ul li {
+    margin: 0;
+}
+
+nav ul li a {
+    display: block;
+
+    color: white;
+
+    text-decoration: none;
+
+    padding: 18px 16px;
+
+    font-size: 15px;
+
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    background: #e00000;
+    color: white;
+}
+
+
+/* ================================
+   CONTENIDO
+================================ */
+
+main {
+    width: 90%;
+    max-width: 1200px;
+
+    margin: auto;
+
+    padding-bottom: 50px;
+}
+
+section {
+    margin-top: 45px;
+}
+
+
+/* ================================
+   TITULOS
+================================ */
+
+h2 {
+    color: #ff1a1a;
+
+    font-size: 30px;
+
+    margin-bottom: 15px;
+
+    border-left: 5px solid #e00000;
+
+    padding-left: 12px;
+}
+
+h3 {
+    color: #ffffff;
+}
+
+
+/* ================================
+   INTRODUCCIÓN
+================================ */
+
+.introduccion {
+    background: linear-gradient(
+        135deg,
+        #1c1c1c,
+        #252525
+    );
+
+    text-align: center;
+
+    padding: 60px 30px;
+
+    border-radius: 15px;
+
+    margin-top: 45px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.introduccion h2 {
+    border: none;
+
+    padding: 0;
+
+    font-size: 40px;
+}
+
+.introduccion p {
+    color: #cccccc;
+
+    font-size: 18px;
+
+    margin-top: 15px;
+}
+
+
+/* ================================
+   TABLAS
+================================ */
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: #1b1b1b;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+th {
+    background: #e00000;
+
+    color: white;
+
+    padding: 18px;
+
+    text-align: center;
+}
+
+td {
+    padding: 18px;
+
+    text-align: center;
+
+    border-bottom: 1px solid #333333;
+
+    color: #dddddd;
+}
+
+tr:hover {
+    background: #252525;
+}
+
+td img {
+    border-radius: 10px;
+
+    max-width: 180px;
+
+    transition: 0.3s;
+}
+
+td img:hover {
+    transform: scale(1.05);
+}
+
+
+/* ================================
+   FORMULARIOS
+================================ */
+
+.formulario {
+    background: #1b1b1b;
+
+    width: 450px;
+
+    max-width: 95%;
+
+    margin: 60px auto;
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+}
+
+.formulario h2 {
+    text-align: center;
+
+    border: none;
+
+    padding: 0;
+
+    margin-bottom: 30px;
+}
+
+.formulario p {
+    text-align: center;
+
+    color: #bbbbbb;
+
+    margin-top: 20px;
+}
+
+.formulario label {
+    display: block;
+
+    margin-top: 18px;
+
+    margin-bottom: 7px;
+
+    color: #eeeeee;
+
+    font-weight: bold;
+}
+
+.formulario input {
+    width: 100%;
+
+    padding: 13px;
+
+    background: #292929;
+
+    color: white;
+
+    border: 1px solid #444444;
+
+    border-radius: 7px;
+
+    outline: none;
+}
+
+.formulario input:focus {
+    border-color: #e00000;
+}
+
+.formulario button {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-top: 25px;
+
+    background: #e00000;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+.formulario button:hover {
+    background: #ff2222;
+
+    transform: translateY(-2px);
+}
+
+.formulario a {
+    color: #ff3333;
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+.formulario a:hover {
+    color: white;
+}
+
+
+/* ================================
+    LOGIN
+================================ */
+
+.login {
+    background: #1b1b1b;
+
+    width: 450px;
+
+    max-width: 95%;
+
+    margin: 60px auto;
+
+    padding: 40px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+}
+
+.login h2 {
+    text-align: center;
+
+    border: none;
+
+    padding: 0;
+
+    margin-bottom: 30px;
+}
+
+
+
+.login label {
+    display: block;
+
+    margin-top: 18px;
+
+    margin-bottom: 7px;
+
+    color: #eeeeee;
+
+    font-weight: bold;
+}
+
+.login input {
+    width: 100%;
+
+    padding: 13px;
+
+    background: #292929;
+
+    color: white;
+
+    border: 1px solid #444444;
+
+    border-radius: 7px;
+
+    outline: none;
+}
+
+.login input:focus {
+    border-color: #e00000;
+}
+
+.login button {
+    width: 100%;
+
+    padding: 14px;
+
+    margin-top: 25px;
+
+    background: #e00000;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 7px;
+
+    cursor: pointer;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    transition: 0.3s;
+}
+
+.login button:hover {
+    background: #ff2222;
+
+    transform: translateY(-2px);
+}
+
+.login a {
+    color: #ff3333;
+
+    text-decoration: none;
+
+    font-weight: bold;
+}
+
+.login a:hover {
+    color: white;
+}
+
+.error {
+    background: #3a1111;
+
+    border: 1px solid #e00000;
+
+    color: #ff5555 !important;
+
+    padding: 12px;
+
+    border-radius: 7px;
+
+    margin-bottom: 15px;
+}
+
+
+/* ================================
+   PERFIL
+================================ */
+
+.perfil {
+    background: #1b1b1b;
+
+    width: 550px;
+
+    max-width: 95%;
+
+    margin: 60px auto;
+
+    padding: 45px;
+
+    text-align: center;
+
+    border-radius: 15px;
+
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+}
+
+.perfil h2 {
+    border: none;
+
+    padding: 0;
+}
+
+.perfil h3 {
+    font-size: 25px;
+
+    margin: 25px 0;
+
+    color: #ff3333;
+}
+
+.perfil p {
+    color: #cccccc;
+
+    margin: 15px;
+}
+
+
+/* ================================
+   CONTACTO
+================================ */
+
+.contacto {
+    background: #1b1b1b;
+
+    max-width: 650px;
+
+    margin: 60px auto;
+
+    padding: 45px;
+
+    text-align: center;
+
+    border-radius: 15px;
+
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+}
+
+.contacto h2 {
+    border: none;
+
+    padding: 0;
+}
+
+.contacto p {
+    color: #cccccc;
+
+    margin: 15px;
+}
+
+.datos-contacto {
+    margin-top: 30px;
+
+    padding: 20px;
+
+    background: #252525;
+
+    border-radius: 10px;
+}
+
+
+/* ================================
+   FOOTER
+================================ */
+
+footer {
+    background: #080808;
+
+    color: #999999;
+
+    text-align: center;
+
+    padding: 25px;
+
+    margin-top: 50px;
+
+    border-top: 1px solid #333333;
+}
+
+
+/* ================================
+   CELULAR
+================================ */
+
+@media (max-width: 700px) {
+
+    header h1 {
+        font-size: 30px;
+    }
+
+    nav ul {
+        flex-direction: column;
+    }
+
+    nav ul li {
+        width: 100%;
+
+        text-align: center;
+    }
+
+    .introduccion h2 {
+        font-size: 30px;
+    }
+
+    table {
+        font-size: 13px;
+    }
+
+    th,
+    td {
+        padding: 10px;
+    }
+
+    td img {
+        width: 100px;
+    }
+
+    .formulario {
+        padding: 25px;
+    }
+
+}
+ .MENSAJE{
+    color:red;
+    font-weight:bold;
+    margin:10px 0;
+ }

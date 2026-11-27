@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Perfil - Moon-cars</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<header>
+
+    <h1>Moon-cars </h1>
+
+</header>
+
+
+<nav>
+
+    <ul>
+
+        <li><a href="/">Inicio</a></li>
+        <li><a href="/contacto">Contacto</a></li>
+        <li><a href="/login">Login</a></li>
+
+    </ul>
+
+</nav>
+
+
+<div class="perfil">
+
+    <h2>Mi Perfil</h2>
+
+
+    {% if usuario %}
+
+        <h3>{{ usuario.nombre }}</h3>
+
+        <p>
+            Correo: {{ usuario.correo }}
+        </p>
+
+    {% else %}
+
+        <p>
+            No has iniciado sesión.
+        </p>
+
+        <a href="/login">
+            Iniciar sesión
+        </a>
+
+    {% endif %}
+
+</div>
+
+
+</body>
+
+</html>
