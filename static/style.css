@@ -2108,3 +2108,116 @@ footer {
     }
 
 }
+
+
+/* ================================
+   HISTORIAL DE VENTAS / MIS COMPRAS
+================================ */
+
+.resumen-ventas {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+.resumen-tarjeta {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 20px 25px;
+
+    background: #1b1b1b;
+
+    border-left: 4px solid #e00000;
+
+    border-radius: 10px;
+}
+
+.resumen-tarjeta span {
+    color: #999999;
+
+    font-size: 14px;
+}
+
+.resumen-tarjeta strong {
+    color: white;
+
+    font-size: 26px;
+}
+
+.tabla-historial .boton-chico {
+    display: inline-block;
+
+    text-decoration: none;
+}
+
+@media (max-width: 800px) {
+
+    /* Cada venta en forma de tarjeta */
+    .tabla-historial,
+    .tabla-historial tbody,
+    .tabla-historial tr,
+    .tabla-historial td {
+        display: block;
+
+        width: 100%;
+    }
+
+    .tabla-historial {
+        background: transparent;
+
+        box-shadow: none;
+    }
+
+    .tabla-historial tr:first-child {
+        display: none;
+    }
+
+    .tabla-historial tr {
+        background: #1b1b1b;
+
+        border-radius: 10px;
+
+        margin-bottom: 12px;
+
+        padding: 8px 0;
+    }
+
+    .tabla-historial td {
+        display: flex;
+
+        justify-content: space-between;
+
+        gap: 10px;
+
+        padding: 6px 15px;
+
+        border-bottom: none;
+
+        text-align: right;
+    }
+
+    .tabla-historial td[data-label]::before {
+        content: attr(data-label);
+
+        color: #999999;
+
+        font-weight: bold;
+
+        text-align: left;
+    }
+
+    .tabla-historial .celda-quitar .boton-chico {
+        width: 100%;
+
+        text-align: center;
+    }
+
+}

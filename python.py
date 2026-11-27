@@ -913,6 +913,90 @@ def comprar():
 
 
 # =========================
+# HISTORIAL DE VENTAS
+# =========================
+
+# Consulta base del historial: cada venta con su cliente, vendedor
+# y cuántas piezas lleva (se le agrega el WHERE según quién la pide)
+CONSULTA_VENTAS = """
+    SELECT v.id, v.fecha, v.total,
+           c.nombre AS cliente,
+           e.nombre AS vendedor,
+           COALESCE(SUM(d.cantidad), 0) AS piezas
+    FROM ventas v
+    LEFT JOIN usuarios c ON c.id = v.cliente_id
+    LEFT JOIN usuarios e ON e.id = v.vendedor_id
+    LEFT JOIN detalle_venta d ON d.venta_id = v.id
+    {filtro}
+    GROUP BY v.id, v.fecha, v.total, c.nombre, e.nombre
+    ORDER BY v.fecha DESC, v.id DESC
+"""
+
+
+def consultar_ventas(filtro="", parametros=()):
+    """Regresa la lista de ventas; filtro es un WHERE con %s (parametrizado)."""
+
+    cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+    cursor.execute(CONSULTA_VENTAS.format(filtro=filtro), parametros)
+
+    ventas = cursor.fetchall()
+
+    cursor.close()
+
+    return ventas
+
+
+@app.route("/ventas")
+@rol_requerido(ROL_ADMINISTRADOR, ROL_EMPLEADO)
+def ventas():
+
+    try:
+        lista_ventas = consultar_ventas()
+
+    except MySQLdb.Error as error:
+        print("Error al cargar las ventas:", error)
+
+        flash("No se pudieron cargar las ventas.", "error")
+
+        lista_ventas = []
+
+    return render_template(
+        "ventas.html",
+        titulo="Historial de ventas",
+        ventas=lista_ventas,
+        total_vendido=sum(venta["total"] for venta in lista_ventas),
+        es_historial=True
+    )
+
+
+@app.route("/mis-compras")
+@login_requerido
+def mis_compras():
+
+    try:
+        lista_ventas = consultar_ventas(
+            "WHERE v.cliente_id = %s",
+            (session["usuario_id"],)
+        )
+
+    except MySQLdb.Error as error:
+        print("Error al cargar las compras:", error)
+
+        flash("No se pudieron cargar tus compras.", "error")
+
+        lista_ventas = []
+
+    return render_template(
+        "ventas.html",
+        titulo="Mis compras",
+        ventas=lista_ventas,
+        total_vendido=sum(venta["total"] for venta in lista_ventas),
+        es_historial=False
+    )
+
+
+# =========================
 # TICKET DE UNA VENTA
 # =========================
 
