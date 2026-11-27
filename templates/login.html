@@ -39,9 +39,14 @@
     <h2>Iniciar sesión</h2>
 
     <p>Ingresa a tu cuenta de Moon-cars</p>
-    <form action="login.html">
-    
-    <label for="correo">
+
+    {% if mensaje %}
+        <p class="mensaje">{{ mensaje }}</p>
+    {% endif %}
+
+    <form method="POST" action="/login">
+
+        <label for="correo">
             Correo electrónico:
         </label>
 
