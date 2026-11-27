@@ -6,70 +6,112 @@
 
     <!-- REGISTRO -->
 
-    <div class="formulario">
+    <div class="card tarjeta-mc tarjeta-formulario">
 
-        <h2>Crear cuenta</h2>
+        <div class="card-body p-4 p-md-5">
 
-        {% if mensaje %}
-            <p class="aviso aviso-error">{{ mensaje }}</p>
-        {% endif %}
+            <h2 class="text-center titulo-formulario">
+                <i class="fa-solid fa-user-plus"></i> Crear cuenta
+            </h2>
+
+            {% if mensaje %}
+                <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation"></i> {{ mensaje }}
+                </div>
+            {% endif %}
 
 
-        <form method="POST" id="formRegistro">
+            <form method="POST" id="formRegistro">
 
-            <label>Nombre completo:</label>
+                <div class="mb-3">
 
-            <input
-                type="text"
-                name="nombre"
-                id="nombre"
-                required
-                maxlength="100"
-            >
+                    <label for="nombre" class="form-label fw-bold">Nombre completo:</label>
 
-            <label>Correo electrónico:</label>
+                    <div class="input-group">
 
-            <input
-                type="email"
-                name="correo"
-                id="correo"
-                required
-                maxlength="150"
-            >
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
 
-            <label>Contraseña:</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            name="nombre"
+                            id="nombre"
+                            required
+                            maxlength="100"
+                        >
 
-            <input
-                type="password"
-                name="password"
-                id="password"
-                required
-            >
+                    </div>
 
-            <p>
-                La contraseña debe tener mínimo 8 caracteres,
-                una mayúscula, una minúscula, un número
-                y un carácter especial.
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="correo" class="form-label fw-bold">Correo electrónico:</label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+
+                        <input
+                            type="email"
+                            class="form-control"
+                            name="correo"
+                            id="correo"
+                            required
+                            maxlength="150"
+                        >
+
+                    </div>
+
+                </div>
+
+                <div class="mb-2">
+
+                    <label for="password" class="form-label fw-bold">Contraseña:</label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+
+                        <input
+                            type="password"
+                            class="form-control"
+                            name="password"
+                            id="password"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+                <p class="form-text">
+                    La contraseña debe tener mínimo 8 caracteres,
+                    una mayúscula, una minúscula, un número
+                    y un carácter especial.
+                </p>
+
+
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
+                    <i class="fa-solid fa-user-check"></i> Registrarme
+                </button>
+
+            </form>
+
+
+            <p class="text-center text-secondary mt-4 mb-0">
+                ¿Ya tienes una cuenta?
+                <a href="/login" class="fw-bold">Iniciar sesión</a>
             </p>
 
-
-            <button type="submit">
-                Registrarme
-            </button>
-
-        </form>
-
-
-        <p>
-            ¿Ya tienes una cuenta?
-        </p>
-
-        <a href="/login">
-            Iniciar sesión
-        </a>
+        </div>
 
     </div>
 
+{% endblock %}
+
+
+{% block scripts %}
 
 <script>
 

@@ -4,150 +4,181 @@
 
 {% block contenido %}
 
-        <!-- AUTOMÓVILES -->
+    <!-- AUTOMÓVILES -->
 
-        <section class="introduccion">
+    <section class="introduccion text-center">
 
-            <h2>Automóviles</h2>
+        <h2>Automóviles</h2>
 
-            <p>
-                
-                En esta pagina encuentra diferentes autos y refracciones originales en un buen precio. 
-                Llevamos mas de 5 años en el mercado, con la facilidad de tener el auto de tus sueños con incluso obtener esas piezas de tus autos que otros te han dicho que son dificiles.
-                Por que nosostros amamos los carros y con ese mismo amor te ayudamos.
-            </p>
+        <p>
+            En esta página encuentras diferentes autos y refacciones originales a un buen precio.
+            Llevamos más de 5 años en el mercado, con la facilidad de tener el auto de tus sueños
+            e incluso conseguir esas piezas que otros te han dicho que son difíciles.
+            Porque nosotros amamos los carros, y con ese mismo amor te ayudamos.
+        </p>
 
-        </section>
+        <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
 
+            <a href="{{ url_for('catalogo', categoria=1) }}" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-car"></i> Ver carros
+            </a>
 
-        <!-- CARROS -->
+            <a href="{{ url_for('catalogo', categoria=2) }}" class="btn btn-outline-light btn-lg">
+                <i class="fa-solid fa-gears"></i> Ver refacciones
+            </a>
 
-        <section>
+        </div>
 
-            <h2>Carros Destacados</h2>
-
-
-            <table>
-
-                <tr>
-
-                    <th>Imagen</th>
-
-                    <th>Modelo</th>
-
-                    <th>Marca</th>
-
-                    <th>Precio</th>
-
-                </tr>
+    </section>
 
 
-                <tr>
+    <!-- CARROS -->
 
-                    <td>
+    <section class="mt-5">
 
-                        <img
-                            src="{{ url_for('static', filename='img/mustang.jpg') }}"
-                            width="180"
-                            alt="Mustang GT"
-                        >
+        <h2 class="titulo-seccion">Carros Destacados</h2>
 
-                    </td>
+        <div class="table-responsive">
 
-                    <td>Mustang GT</td>
+            <table class="table table-dark table-hover align-middle text-center tabla-mc">
 
-                    <td>Ford</td>
+                <thead>
 
-                    <td>$950,000</td>
+                    <tr>
 
-                </tr>
+                        <th>Imagen</th>
 
+                        <th>Modelo</th>
 
-                <tr>
+                        <th>Marca</th>
 
-                    <td>
+                        <th>Precio</th>
 
-                       <img src="{{ url_for('static', filename='img/jetta.jpg') }}" 
-                       width="180" 
-                       alt="Jetta GLI">
+                    </tr>
 
-                    </td>
+                </thead>
 
-                    <td>Jetta GLI</td>
+                <tbody>
 
-                    <td>Volkswagen</td>
+                    <tr>
 
-                    <td>$620,000</td>
+                        <td>
 
-                </tr>
+                            <img
+                                src="{{ url_for('static', filename='img/mustang.jpg') }}"
+                                class="img-fluid rounded imagen-tabla"
+                                alt="Mustang GT"
+                            >
+
+                        </td>
+
+                        <td>Mustang GT</td>
+
+                        <td>Ford</td>
+
+                        <td>$950,000</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>
+
+                            <img
+                                src="{{ url_for('static', filename='img/jetta.jpg') }}"
+                                class="img-fluid rounded imagen-tabla"
+                                alt="Jetta GLI"
+                            >
+
+                        </td>
+
+                        <td>Jetta GLI</td>
+
+                        <td>Volkswagen</td>
+
+                        <td>$620,000</td>
+
+                    </tr>
+
+                </tbody>
 
             </table>
 
-        </section>
+        </div>
+
+    </section>
 
 
-        <!-- REFACCIONES -->
+    <!-- REFACCIONES -->
 
-        <section>
+    <section class="mt-5">
 
-            <h2>Refacciones</h2>
+        <h2 class="titulo-seccion">Refacciones</h2>
 
+        <div class="table-responsive">
 
-            <table>
+            <table class="table table-dark table-hover align-middle text-center tabla-mc">
 
-                <tr>
+                <thead>
 
-                    <th>Imagen</th>
+                    <tr>
 
-                    <th>Producto</th>
+                        <th>Imagen</th>
 
-                    <th>Precio</th>
+                        <th>Producto</th>
 
-                </tr>
+                        <th>Precio</th>
 
+                    </tr>
 
-                <tr>
+                </thead>
 
-                    <td>
+                <tbody>
 
-                        <img
-                            src="{{ url_for('static', filename='img/aceite.jpg') }}"
-                            width="120"
-                            alt="Aceite sintético"
-                        >
+                    <tr>
 
-                    </td>
+                        <td>
 
-                    <td>Aceite Sintético</td>
+                            <img
+                                src="{{ url_for('static', filename='img/aceite.jpg') }}"
+                                class="img-fluid rounded imagen-tabla"
+                                alt="Aceite sintético"
+                            >
 
-                    <td>$550</td>
+                        </td>
 
-                </tr>
+                        <td>Aceite Sintético</td>
 
+                        <td>$550</td>
 
-                <tr>
+                    </tr>
 
-                    <td></td>
+                    <tr>
 
-                    <td>Llanta Michelin</td>
+                        <td><i class="fa-solid fa-circle-notch text-secondary"></i></td>
 
-                    <td>$3,200</td>
+                        <td>Llanta Michelin</td>
 
-                </tr>
+                        <td>$3,200</td>
 
+                    </tr>
 
-                <tr>
+                    <tr>
 
-                    <td></td>
+                        <td><i class="fa-solid fa-car-battery text-secondary"></i></td>
 
-                    <td>Batería LTH</td>
+                        <td>Batería LTH</td>
 
-                    <td>$2,100</td>
+                        <td>$2,100</td>
 
-                </tr>
+                    </tr>
+
+                </tbody>
 
             </table>
 
-        </section>
+        </div>
+
+    </section>
 
 {% endblock %}
