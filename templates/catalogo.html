@@ -1,0 +1,101 @@
+{% extends "plantilla.html" %}
+
+{% block titulo %}Catálogo - Moon-cars{% endblock %}
+
+{% block contenido %}
+
+    <!-- CATÁLOGO -->
+
+    <section class="catalogo">
+
+        <h2>Catálogo</h2>
+
+        <p class="catalogo-descripcion">
+            Autos y refacciones disponibles en Moon-cars.
+            Da clic en un producto para ver todos sus detalles.
+        </p>
+
+
+        <!-- FILTRO POR CATEGORÍA -->
+
+        <div class="filtros">
+
+            <a href="{{ url_for('catalogo') }}"
+               class="filtro {% if not categoria_actual %}filtro-activo{% endif %}">
+                Todos
+            </a>
+
+            {% for categoria in categorias %}
+
+                <a href="{{ url_for('catalogo', categoria=categoria.id) }}"
+                   class="filtro {% if categoria_actual == categoria.id %}filtro-activo{% endif %}">
+                    {{ categoria.nombre }}
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+
+        <!-- PRODUCTOS -->
+
+        {% if productos %}
+
+            <div class="productos-grid">
+
+                {% for producto in productos %}
+
+                    <article class="tarjeta-producto">
+
+                        <a href="{{ url_for('producto', producto_id=producto.id) }}"
+                           class="tarjeta-imagen">
+
+                            {% if producto.imagen_base64 %}
+                                <img
+                                    src="{{ producto.imagen_base64 }}"
+                                    alt="{{ producto.nombre }}"
+                                >
+                            {% else %}
+                                <span class="sin-imagen">Sin imagen</span>
+                            {% endif %}
+
+                        </a>
+
+                        <div class="tarjeta-cuerpo">
+
+                            <span class="etiqueta">{{ producto.categoria }}</span>
+
+                            <h3>{{ producto.nombre }}</h3>
+
+                            <p class="marca">{{ producto.marca }}</p>
+
+                            <p class="precio">{{ producto.precio | moneda }}</p>
+
+                            {% if producto.stock > 0 %}
+                                <p class="stock">{{ producto.stock }} disponible(s)</p>
+                            {% else %}
+                                <p class="stock agotado">Agotado</p>
+                            {% endif %}
+
+                            <a href="{{ url_for('producto', producto_id=producto.id) }}"
+                               class="boton">
+                                Ver producto
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <p class="vacio">No hay productos en esta categoría.</p>
+
+        {% endif %}
+
+    </section>
+
+{% endblock %}
