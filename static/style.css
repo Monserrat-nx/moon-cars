@@ -54,9 +54,20 @@ nav {
     position: sticky;
     top: 0;
     z-index: 100;
+
+    /* Menú a la izquierda / centro y botones de cuenta a la derecha */
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    padding: 0 20px;
 }
 
 nav ul {
+    flex: 1;
+
     list-style: none;
 
     display: flex;
@@ -120,6 +131,128 @@ nav ul li a:hover {
     margin-right: 6px;
 
     vertical-align: middle;
+}
+
+/* ---------- Botones de cuenta (arriba a la derecha) ---------- */
+
+.cuenta-menu {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 8px 0;
+}
+
+.boton-entrar {
+    padding: 9px 18px;
+
+    background: #e00000;
+
+    color: white;
+
+    border-radius: 25px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition: 0.3s;
+}
+
+.boton-entrar:hover {
+    background: #ff2222;
+}
+
+.cuenta-registro {
+    color: #cccccc;
+
+    font-size: 14px;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+}
+
+.cuenta-registro:hover {
+    color: white;
+}
+
+.cuenta-usuario {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 5px 12px 5px 5px;
+
+    background: #252525;
+
+    color: white;
+
+    border-radius: 25px;
+
+    text-decoration: none;
+
+    font-size: 14px;
+
+    white-space: nowrap;
+
+    transition: 0.3s;
+}
+
+.cuenta-usuario:hover {
+    background: #333333;
+}
+
+.cuenta-avatar {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 30px;
+
+    height: 30px;
+
+    background: #e00000;
+
+    border-radius: 50%;
+
+    font-weight: bold;
+}
+
+.boton-salir {
+    padding: 8px 16px;
+
+    color: #ff5555;
+
+    border: 1px solid #e00000;
+
+    border-radius: 25px;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition: 0.3s;
+}
+
+.boton-salir:hover {
+    background: #e00000;
+
+    color: white;
 }
 
 .rol-menu {
@@ -386,38 +519,110 @@ td img:hover {
 
 
 /* ================================
-    LOGIN
+   PANTALLA DE INICIO DE SESIÓN
 ================================ */
 
-.login {
-    background: #1b1b1b;
-
-    width: 450px;
-
-    max-width: 95%;
-
-    margin: 60px auto;
-
-    padding: 40px;
-
-    border-radius: 15px;
-
-    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+.pagina-acceso {
+    background: #101010;
 }
 
-.login h2 {
-    text-align: center;
+.acceso {
+    display: grid;
 
+    grid-template-columns: 1.1fr 1fr;
+
+    min-height: 100vh;
+
+    /* Ocupa toda la pantalla (no el 90% del <main> normal) */
+    width: 100%;
+
+    max-width: none;
+
+    margin: 0;
+
+    padding: 0;
+}
+
+.acceso-marca {
+    display: flex;
+
+    align-items: flex-end;
+
+    padding: 60px;
+
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.85)
+    ),
+    url("img/mustang.jpg");
+
+    background-size: cover;
+
+    background-position: center;
+}
+
+.acceso-marca-texto h1 {
+    font-size: 56px;
+
+    letter-spacing: 2px;
+}
+
+.acceso-marca-texto p {
+    color: #dddddd;
+
+    font-size: 20px;
+
+    margin: 10px 0 25px;
+}
+
+.acceso-marca-texto ul {
+    list-style: none;
+}
+
+.acceso-marca-texto li {
+    color: #eeeeee;
+
+    margin-bottom: 10px;
+
+    padding-left: 22px;
+
+    border-left: 3px solid #e00000;
+}
+
+.acceso-formulario {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 40px 25px;
+}
+
+.acceso-tarjeta {
+    width: 100%;
+
+    max-width: 420px;
+}
+
+.acceso-tarjeta h2 {
     border: none;
 
     padding: 0;
 
-    margin-bottom: 30px;
+    font-size: 34px;
+
+    margin-bottom: 8px;
 }
 
+.acceso-subtitulo {
+    color: #bbbbbb;
 
+    margin-bottom: 25px;
+}
 
-.login label {
+.acceso-tarjeta label {
     display: block;
 
     margin-top: 18px;
@@ -429,80 +634,140 @@ td img:hover {
     font-weight: bold;
 }
 
-.login input {
+.acceso-tarjeta input[type="email"],
+.acceso-tarjeta input[type="password"],
+.acceso-tarjeta input[type="text"] {
     width: 100%;
 
-    padding: 13px;
+    padding: 14px;
 
-    background: #292929;
+    background: #1e1e1e;
 
     color: white;
 
     border: 1px solid #444444;
 
-    border-radius: 7px;
+    border-radius: 8px;
 
     outline: none;
+
+    font-size: 15px;
 }
 
-.login input:focus {
+.acceso-tarjeta input:focus {
     border-color: #e00000;
 }
 
-.login button {
-    width: 100%;
+.campo-password {
+    position: relative;
+}
 
-    padding: 14px;
+.campo-password input {
+    padding-right: 90px !important;
+}
 
-    margin-top: 25px;
+.ver-password {
+    position: absolute;
 
-    background: #e00000;
+    top: 50%;
 
-    color: white;
+    right: 8px;
+
+    transform: translateY(-50%);
+
+    padding: 6px 10px;
+
+    background: #333333;
+
+    color: #dddddd;
 
     border: none;
 
-    border-radius: 7px;
+    border-radius: 6px;
 
     cursor: pointer;
 
-    font-size: 16px;
-
-    font-weight: bold;
-
-    transition: 0.3s;
+    font-size: 13px;
 }
 
-.login button:hover {
-    background: #ff2222;
+.ver-password:hover {
+    background: #e00000;
 
-    transform: translateY(-2px);
-}
-
-.login a {
-    color: #ff3333;
-
-    text-decoration: none;
-
-    font-weight: bold;
-}
-
-.login a:hover {
     color: white;
 }
 
-.error {
-    background: #3a1111;
+.acceso-tarjeta .recordarme {
+    display: flex;
 
-    border: 1px solid #e00000;
+    align-items: center;
 
-    color: #ff5555 !important;
+    gap: 10px;
 
-    padding: 12px;
+    margin-top: 18px;
 
-    border-radius: 7px;
+    font-weight: normal;
 
-    margin-bottom: 15px;
+    color: #cccccc;
+
+    cursor: pointer;
+}
+
+.recordarme input {
+    width: 18px;
+
+    height: 18px;
+
+    accent-color: #e00000;
+
+    cursor: pointer;
+}
+
+.boton-acceso {
+    width: 100%;
+
+    margin-top: 25px;
+
+    padding: 15px;
+
+    font-size: 16px;
+}
+
+.acceso-registro {
+    margin-top: 25px;
+
+    color: #bbbbbb;
+
+    text-align: center;
+}
+
+.acceso-registro a {
+    color: #ff3333;
+
+    font-weight: bold;
+
+    text-decoration: none;
+}
+
+.acceso-registro a:hover {
+    color: white;
+}
+
+.acceso-invitado {
+    display: block;
+
+    margin-top: 15px;
+
+    color: #999999;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    font-size: 14px;
+}
+
+.acceso-invitado:hover {
+    color: white;
 }
 
 
@@ -1241,19 +1506,37 @@ footer {
    TABLETA Y CELULAR (MENÚ PLEGABLE)
 ================================ */
 
-@media (max-width: 992px) {
+@media (max-width: 1080px) {
 
     header {
         padding: 45px 20px;
     }
 
-    .menu-boton {
-        display: block;
+    nav {
+        padding: 0 10px;
     }
 
-    /* El menú se oculta hasta que se presiona el botón */
+    .menu-boton {
+        display: block;
+
+        width: auto;
+
+        padding: 16px 10px;
+    }
+
+    /* Los botones de cuenta se quedan visibles a la derecha */
+    .cuenta-menu {
+        margin-left: auto;
+    }
+
+    /* El menú se oculta hasta que se presiona el botón
+       y se abre debajo, a todo lo ancho */
     nav ul {
         display: none;
+
+        order: 3;
+
+        flex-basis: 100%;
 
         flex-direction: column;
 
@@ -1284,6 +1567,53 @@ footer {
 ================================ */
 
 @media (max-width: 700px) {
+
+    /* En celular solo se ve la inicial del usuario y el botón Salir */
+    .cuenta-nombre,
+    .cuenta-usuario .rol-menu,
+    .cuenta-registro {
+        display: none;
+    }
+
+    .cuenta-usuario {
+        padding: 4px;
+    }
+
+    .boton-entrar,
+    .boton-salir {
+        padding: 8px 14px;
+
+        font-size: 13px;
+    }
+
+    /* Pantalla de inicio de sesión en una columna */
+    .acceso {
+        grid-template-columns: 1fr;
+    }
+
+    .acceso-marca {
+        min-height: 200px;
+
+        padding: 30px 25px;
+    }
+
+    .acceso-marca-texto h1 {
+        font-size: 36px;
+    }
+
+    .acceso-marca-texto p {
+        font-size: 16px;
+
+        margin-bottom: 0;
+    }
+
+    .acceso-marca-texto ul {
+        display: none;
+    }
+
+    .acceso-tarjeta h2 {
+        font-size: 28px;
+    }
 
     header {
         padding: 35px 15px;

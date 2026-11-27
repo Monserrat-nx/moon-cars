@@ -25,26 +25,52 @@ database=MySQL(app)
 @app.route("/")
 def inicio():
 
+    # La primera vez que alguien entra ve la pantalla de inicio de sesión.
+    # Si inicia sesión o elige "Continuar sin cuenta", ya ve la página normal.
+    if "usuario_id" not in session and not session.get("invitado"):
+        return redirect(url_for("login"))
+
     return render_template("Proyecto.html")
+
+
+# =========================
+# ENTRAR SIN CUENTA (INVITADO)
+# =========================
+
+@app.route("/invitado")
+def invitado():
+
+    session["invitado"] = True
+
+    return redirect(url_for("inicio"))
 
 
 # =========================
 # LOGIN
 # =========================
 
+# Cookie donde se guarda el correo si el usuario marcó "Recordarme"
+COOKIE_CORREO = "correo_recordado"
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
     # Si ya inició sesión, no tiene caso volver a entrar
     if "usuario_id" in session:
-        return redirect(url_for("perfil"))
+        return redirect(url_for("inicio"))
 
     mensaje = ""
+
+    # Correo que se recordó la última vez (si marcó "Recordarme")
+    correo = request.cookies.get(COOKIE_CORREO, "")
+    recordar = bool(correo)
 
     if request.method == "POST":
 
         correo = request.form.get("correo", "").strip()
         password = request.form.get("password", "")
+        recordar = request.form.get("recordar") == "on"
 
         try:
             cursor = database.connection.cursor()
@@ -67,8 +93,10 @@ def login():
             print("Error al iniciar sesión:", error)
 
             return render_template(
-                "login.html",
-                mensaje="No se pudo conectar con la base de datos. Intenta más tarde."
+                "acceso.html",
+                mensaje="No se pudo conectar con la base de datos. Intenta más tarde.",
+                correo=correo,
+                recordar=recordar
             )
 
         if usuario and check_password_hash(usuario[3], password):
@@ -77,16 +105,37 @@ def login():
             session["usuario_id"] = usuario[0]
             session["nombre"] = usuario[1]
             session["rol"] = usuario[4]
+            session.pop("invitado", None)
+
+            # Recordarme: la sesión dura 30 días aunque se cierre el navegador.
+            # Si no lo marca, la sesión se borra al cerrar el navegador.
+            session.permanent = recordar
 
             flash(f"Bienvenido(a), {usuario[1]}.", "exito")
 
-            return redirect(url_for("perfil"))
+            respuesta = redirect(url_for("inicio"))
+
+            if recordar:
+                respuesta.set_cookie(
+                    COOKIE_CORREO,
+                    correo,
+                    max_age=60 * 60 * 24 * 30,
+                    httponly=True,
+                    samesite="Lax"
+                )
+
+            else:
+                respuesta.delete_cookie(COOKIE_CORREO)
+
+            return respuesta
 
         mensaje = "Correo o contraseña incorrectos"
 
     return render_template(
-        "login.html",
-        mensaje=mensaje
+        "acceso.html",
+        mensaje=mensaje,
+        correo=correo,
+        recordar=recordar
     )
 
 
@@ -102,9 +151,12 @@ def logout():
     session.pop("nombre", None)
     session.pop("rol", None)
 
+    # La sesión deja de ser "recordada"
+    session.permanent = False
+
     flash("Cerraste sesión correctamente.", "exito")
 
-    return redirect(url_for("inicio"))
+    return redirect(url_for("login"))
 
 # =========================
 # REGISTRO

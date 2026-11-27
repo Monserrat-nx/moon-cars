@@ -78,32 +78,6 @@
                 <a href="/acercade">Acerca de</a>
             </li>
 
-            <!-- El menú cambia si el usuario inició sesión -->
-            {% if session.usuario_id %}
-
-                <li>
-                    <a href="{{ url_for('perfil') }}" title="{{ session.nombre }} ({{ session.rol }})">
-                        Mi perfil
-                        <span class="rol-menu">{{ session.rol }}</span>
-                    </a>
-                </li>
-
-                <li>
-                    <a href="{{ url_for('logout') }}">Cerrar sesión</a>
-                </li>
-
-            {% else %}
-
-                <li>
-                    <a href="/login">Login</a>
-                </li>
-
-                <li>
-                    <a href="/formulario">Registrarse</a>
-                </li>
-
-            {% endif %}
-
             <li>
                 <a href="{{ url_for('carrito') }}" class="enlace-carrito">
                     Carrito
@@ -112,6 +86,43 @@
             </li>
 
         </ul>
+
+
+        <!-- CUENTA: botones para entrar / salir (cambian si hay sesión) -->
+
+        <div class="cuenta-menu">
+
+            {% if session.usuario_id %}
+
+                <a href="{{ url_for('perfil') }}"
+                   class="cuenta-usuario"
+                   title="{{ session.nombre }} ({{ session.rol }})">
+
+                    <span class="cuenta-avatar">{{ session.nombre[:1] | upper }}</span>
+
+                    <span class="cuenta-nombre">{{ session.nombre.split(' ')[0] }}</span>
+
+                    <span class="rol-menu">{{ session.rol }}</span>
+
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="boton-salir">
+                    Salir
+                </a>
+
+            {% else %}
+
+                <a href="{{ url_for('login') }}" class="boton-entrar">
+                    Iniciar sesión
+                </a>
+
+                <a href="{{ url_for('formulario') }}" class="cuenta-registro">
+                    Registrarse
+                </a>
+
+            {% endif %}
+
+        </div>
 
     </nav>
 
