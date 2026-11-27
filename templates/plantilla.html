@@ -55,14 +55,6 @@
                 <a href="{{ url_for('catalogo') }}">Catálogo</a>
             </li>
 
-            <li>
-                <a href="{{ url_for('catalogo', categoria=1) }}">Carros</a>
-            </li>
-
-            <li>
-                <a href="{{ url_for('catalogo', categoria=2) }}">Refacciones</a>
-            </li>
-
             <!-- Solo el administrador ve esta opción -->
             {% if es_admin %}
                 <li>
