@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Moon-cars</title>
+    <title>{% block titulo %}Moon-cars{% endblock %}</title>
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
@@ -16,6 +16,8 @@
 </head>
 
 <body>
+
+    <!-- ENCABEZADO -->
 
     <header>
 
@@ -26,6 +28,8 @@
     </header>
 
 
+    <!-- MENÚ -->
+
     <nav>
 
         <ul>
@@ -35,11 +39,19 @@
             </li>
 
             <li>
-                <a href="/">Carros</a>
+                <a href="{{ url_for('catalogo') }}">Catálogo</a>
             </li>
 
             <li>
-                <a href="/">Refacciones</a>
+                <a href="{{ url_for('catalogo', categoria=1) }}">Carros</a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('catalogo', categoria=2) }}">Refacciones</a>
+            </li>
+
+            <li>
+                <a href="{{ url_for('agregar_producto') }}">Agregar producto</a>
             </li>
 
             <li>
@@ -62,12 +74,40 @@
                 <a href="/perfil">Perfil</a>
             </li>
 
+            <li>
+                <a href="{{ url_for('carrito') }}" class="enlace-carrito">
+                    Carrito
+                    <span class="contador-carrito">{{ cantidad_carrito }}</span>
+                </a>
+            </li>
+
         </ul>
 
     </nav>
 
 
+    <!-- CONTENIDO PRINCIPAL -->
+
     <main>
+
+        <!-- MENSAJES DE ÉXITO / ERROR -->
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+
+            {% if mensajes %}
+
+                <div class="mensajes">
+
+                    {% for categoria, texto in mensajes %}
+                        <p class="aviso aviso-{{ categoria }}">{{ texto }}</p>
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        {% endwith %}
+
 
         {% block contenido %}
 
@@ -75,6 +115,8 @@
 
     </main>
 
+
+    <!-- PIE DE PÁGINA -->
 
     <footer>
 

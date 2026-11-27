@@ -1,0 +1,222 @@
+{% extends "plantilla.html" %}
+
+{% block titulo %}Agregar producto - Moon-cars{% endblock %}
+
+{% block contenido %}
+
+    <!-- AGREGAR PRODUCTO -->
+
+    <div class="formulario formulario-producto">
+
+        <h2>Agregar producto</h2>
+
+
+        <form method="POST"
+              enctype="multipart/form-data"
+              id="formProducto">
+
+            <label for="nombre">Nombre del producto:</label>
+
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                value="{{ datos.nombre or '' }}"
+                placeholder="Ej. Mustang GT"
+                maxlength="100"
+                required
+            >
+
+
+            <label for="marca">Marca:</label>
+
+            <input
+                type="text"
+                id="marca"
+                name="marca"
+                value="{{ datos.marca or '' }}"
+                placeholder="Ej. Ford"
+                maxlength="60"
+                required
+            >
+
+
+            <label for="categoria_id">Categoría:</label>
+
+            <select id="categoria_id" name="categoria_id" required>
+
+                <option value="">Selecciona una categoría</option>
+
+                {% for categoria in categorias %}
+
+                    <option
+                        value="{{ categoria.id }}"
+                        {% if datos.categoria_id == categoria.id|string %}selected{% endif %}
+                    >
+                        {{ categoria.nombre }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+
+            <div class="campos-dobles">
+
+                <div>
+
+                    <label for="precio">Precio (MXN):</label>
+
+                    <input
+                        type="number"
+                        id="precio"
+                        name="precio"
+                        value="{{ datos.precio or '' }}"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        required
+                    >
+
+                </div>
+
+                <div>
+
+                    <label for="stock">Stock:</label>
+
+                    <input
+                        type="number"
+                        id="stock"
+                        name="stock"
+                        value="{{ datos.stock or '' }}"
+                        min="0"
+                        step="1"
+                        placeholder="0"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+
+            <label for="descripcion">Descripción:</label>
+
+            <textarea
+                id="descripcion"
+                name="descripcion"
+                rows="4"
+                placeholder="Características del producto"
+            >{{ datos.descripcion or '' }}</textarea>
+
+
+            <label for="imagen">Imagen (JPG, PNG, GIF o WEBP, máx. 2 MB):</label>
+
+            <input
+                type="file"
+                id="imagen"
+                name="imagen"
+                accept="image/jpeg,image/png,image/gif,image/webp"
+            >
+
+
+            <!-- VISTA PREVIA DE LA IMAGEN -->
+
+            <div class="vista-previa" id="vistaPrevia">
+                <span class="sin-imagen">Sin imagen seleccionada</span>
+            </div>
+
+
+            <button type="submit">
+                Guardar producto
+            </button>
+
+        </form>
+
+
+        <p>
+            <a href="{{ url_for('catalogo') }}">Volver al catálogo</a>
+        </p>
+
+    </div>
+
+
+<script>
+
+const campoImagen = document.getElementById("imagen");
+const vistaPrevia = document.getElementById("vistaPrevia");
+
+const TAMANO_MAXIMO = 2 * 1024 * 1024;
+
+
+// Mostrar la imagen antes de subirla
+campoImagen.addEventListener("change", function() {
+
+    const archivo = campoImagen.files[0];
+
+    if (!archivo) {
+
+        vistaPrevia.innerHTML = '<span class="sin-imagen">Sin imagen seleccionada</span>';
+
+        return;
+    }
+
+    if (archivo.size > TAMANO_MAXIMO) {
+
+        alert("La imagen es muy grande. El máximo es 2 MB.");
+
+        campoImagen.value = "";
+
+        vistaPrevia.innerHTML = '<span class="sin-imagen">Sin imagen seleccionada</span>';
+
+        return;
+    }
+
+    const lector = new FileReader();
+
+    lector.onload = function(evento) {
+
+        vistaPrevia.innerHTML = "";
+
+        const imagen = document.createElement("img");
+
+        imagen.src = evento.target.result;
+        imagen.alt = "Vista previa";
+
+        vistaPrevia.appendChild(imagen);
+    };
+
+    lector.readAsDataURL(archivo);
+
+});
+
+
+// Validar antes de enviar
+document.getElementById("formProducto").addEventListener("submit", function(event) {
+
+    const precio = parseFloat(document.getElementById("precio").value);
+    const stock = Number(document.getElementById("stock").value);
+
+    if (isNaN(precio) || precio < 0) {
+
+        event.preventDefault();
+
+        alert("El precio debe ser un número mayor o igual a 0.");
+
+        return;
+    }
+
+    if (!Number.isInteger(stock) || stock < 0) {
+
+        event.preventDefault();
+
+        alert("El stock debe ser un número entero mayor o igual a 0.");
+
+        return;
+    }
+
+});
+
+</script>
+
+{% endblock %}

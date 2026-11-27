@@ -1,0 +1,147 @@
+{% extends "plantilla.html" %}
+
+{% block titulo %}Carrito - Moon-cars{% endblock %}
+
+{% block contenido %}
+
+    <!-- CARRITO -->
+
+    <section class="carrito">
+
+        <h2>Mi carrito</h2>
+
+
+        {% if articulos %}
+
+            <table>
+
+                <tr>
+
+                    <th>Imagen</th>
+
+                    <th>Producto</th>
+
+                    <th>Precio</th>
+
+                    <th>Cantidad</th>
+
+                    <th>Subtotal</th>
+
+                    <th></th>
+
+                </tr>
+
+
+                {% for articulo in articulos %}
+
+                    <tr>
+
+                        <td>
+
+                            {% if articulo.imagen_base64 %}
+                                <img
+                                    src="{{ articulo.imagen_base64 }}"
+                                    alt="{{ articulo.nombre }}"
+                                >
+                            {% else %}
+                                <span class="sin-imagen">Sin imagen</span>
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+
+                            <a href="{{ url_for('producto', producto_id=articulo.id) }}">
+                                {{ articulo.nombre }}
+                            </a>
+
+                            <p class="marca">{{ articulo.marca }}</p>
+
+                        </td>
+
+                        <td>{{ articulo.precio | moneda }}</td>
+
+                        <td>
+
+                            <form method="POST"
+                                  action="{{ url_for('actualizar_carrito', producto_id=articulo.id) }}"
+                                  class="form-cantidad">
+
+                                <input
+                                    type="number"
+                                    name="cantidad"
+                                    value="{{ articulo.cantidad }}"
+                                    min="1"
+                                    max="{{ articulo.stock }}"
+                                    required
+                                >
+
+                                <button type="submit" class="boton-chico">
+                                    Actualizar
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                        <td>{{ articulo.subtotal | moneda }}</td>
+
+                        <td>
+
+                            <form method="POST"
+                                  action="{{ url_for('eliminar_carrito', producto_id=articulo.id) }}">
+
+                                <button type="submit" class="boton-eliminar">
+                                    Quitar
+                                </button>
+
+                            </form>
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </table>
+
+
+            <!-- RESUMEN -->
+
+            <div class="carrito-resumen">
+
+                <p class="total">
+                    Total: <strong>{{ total | moneda }}</strong>
+                </p>
+
+                <div class="carrito-acciones">
+
+                    <form method="POST" action="{{ url_for('vaciar_carrito') }}">
+
+                        <button type="submit" class="boton-eliminar">
+                            Vaciar carrito
+                        </button>
+
+                    </form>
+
+                    <a href="{{ url_for('catalogo') }}" class="boton">
+                        Seguir comprando
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% else %}
+
+            <p class="vacio">Tu carrito está vacío.</p>
+
+            <a href="{{ url_for('catalogo') }}" class="boton">
+                Ir al catálogo
+            </a>
+
+        {% endif %}
+
+    </section>
+
+{% endblock %}
