@@ -124,11 +124,60 @@
 
                     </form>
 
-                    <a href="{{ url_for('catalogo') }}" class="boton">
+                    <a href="{{ url_for('catalogo') }}" class="boton-chico boton-seguir">
                         Seguir comprando
                     </a>
 
                 </div>
+
+            </div>
+
+
+            <!-- FINALIZAR COMPRA -->
+
+            <div class="carrito-compra">
+
+                {% if session.usuario_id %}
+
+                    <form method="POST"
+                          action="{{ url_for('comprar') }}"
+                          id="formComprar">
+
+                        <!-- El personal elige a qué cliente le vende -->
+                        {% if es_personal %}
+
+                            <label for="cliente_id">Cliente:</label>
+
+                            <select id="cliente_id" name="cliente_id">
+
+                                <option value="">Público en general</option>
+
+                                {% for cliente in clientes %}
+                                    <option value="{{ cliente.id }}">
+                                        {{ cliente.nombre }} ({{ cliente.correo }})
+                                    </option>
+                                {% endfor %}
+
+                            </select>
+
+                        {% endif %}
+
+                        <button type="submit" class="boton boton-comprar">
+                            {% if es_personal %}Registrar venta{% else %}Comprar ahora{% endif %}
+                            · {{ total | moneda }}
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <p>Para comprar necesitas una cuenta.</p>
+
+                    <a href="{{ url_for('login') }}" class="boton boton-comprar">
+                        Inicia sesión para comprar
+                    </a>
+
+                {% endif %}
 
             </div>
 
@@ -143,5 +192,33 @@
         {% endif %}
 
     </section>
+
+
+<script>
+
+// Confirmar antes de registrar la compra y evitar doble clic
+const formComprar = document.getElementById("formComprar");
+
+if (formComprar) {
+
+    formComprar.addEventListener("submit", function(event) {
+
+        if (!confirm("¿Confirmas la compra por {{ total | moneda }}?")) {
+
+            event.preventDefault();
+
+            return;
+        }
+
+        const boton = formComprar.querySelector("button");
+
+        boton.disabled = true;
+        boton.textContent = "Procesando compra...";
+
+    });
+
+}
+
+</script>
 
 {% endblock %}

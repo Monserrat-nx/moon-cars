@@ -5,7 +5,13 @@ from flask_mysqldb import MySQL
 import MySQLdb
 import MySQLdb.cursors
 from config_server import Config
-from seguridad import login_requerido, rol_requerido, ROL_ADMINISTRADOR, ROL_CLIENTE
+from seguridad import (
+    login_requerido,
+    rol_requerido,
+    ROL_ADMINISTRADOR,
+    ROL_EMPLEADO,
+    ROL_CLIENTE
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 
@@ -371,8 +377,15 @@ def datos_globales():
 
     return {
         "cantidad_carrito": contar_carrito(),
-        "es_admin": session.get("rol") == ROL_ADMINISTRADOR
+        "es_admin": session.get("rol") == ROL_ADMINISTRADOR,
+        "es_personal": es_personal()
     }
+
+
+def es_personal():
+    """True si el usuario es Administrador o Empleado (puede vender en mostrador)."""
+
+    return session.get("rol") in (ROL_ADMINISTRADOR, ROL_EMPLEADO)
 
 
 # =========================
@@ -563,10 +576,37 @@ def carrito():
                 if id_producto in ids_validos
             })
 
+    # El personal (admin / empleado) elige a qué cliente le vende
+    clientes = []
+
+    if articulos and es_personal():
+
+        try:
+            cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+            cursor.execute(
+                """
+                SELECT u.id, u.nombre, u.correo
+                FROM usuarios u
+                INNER JOIN roles r ON r.id = u.rol_id
+                WHERE r.nombre = %s
+                ORDER BY u.nombre
+                """,
+                (ROL_CLIENTE,)
+            )
+
+            clientes = cursor.fetchall()
+
+            cursor.close()
+
+        except MySQLdb.Error as error:
+            print("Error al cargar clientes:", error)
+
     return render_template(
         "carrito.html",
         articulos=articulos,
-        total=total
+        total=total,
+        clientes=clientes
     )
 
 
@@ -710,6 +750,230 @@ def vaciar_carrito():
     flash("Vaciaste el carrito.", "exito")
 
     return redirect(url_for("carrito"))
+
+
+# =========================
+# COMPRAR (REGISTRAR VENTA)
+# =========================
+
+class ErrorDeVenta(Exception):
+    """Error de reglas de negocio (stock, cliente) que cancela la venta."""
+
+
+@app.route("/carrito/comprar", methods=["POST"])
+@login_requerido
+def comprar():
+
+    carrito_sesion = obtener_carrito()
+
+    if not carrito_sesion:
+        flash("Tu carrito está vacío.", "error")
+
+        return redirect(url_for("carrito"))
+
+    # ¿Quién vende y a quién?
+    if es_personal():
+        # Venta en mostrador: el empleado / admin es el vendedor
+        vendedor_id = session["usuario_id"]
+        cliente_texto = request.form.get("cliente_id", "").strip()
+        cliente_id = int(cliente_texto) if cliente_texto.isdigit() else None
+
+    else:
+        # Compra en línea: el cliente se compra a sí mismo, sin vendedor
+        vendedor_id = None
+        cliente_id = session["usuario_id"]
+
+    cursor = None
+
+    try:
+        cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        # ---------- INICIO DE LA TRANSACCIÓN ----------
+        # Todo lo de abajo se guarda junto con COMMIT o se deshace
+        # completo con ROLLBACK (Atomicidad del modelo ACID).
+
+        # Validar que el cliente elegido exista y sea Cliente
+        if es_personal() and cliente_id:
+
+            cursor.execute(
+                """
+                SELECT u.id
+                FROM usuarios u
+                INNER JOIN roles r ON r.id = u.rol_id
+                WHERE u.id = %s AND r.nombre = %s
+                """,
+                (cliente_id, ROL_CLIENTE)
+            )
+
+            if not cursor.fetchone():
+                raise ErrorDeVenta("El cliente seleccionado no es válido.")
+
+        # Bloquear los productos del carrito (FOR UPDATE) para que nadie
+        # más cambie su stock mientras se registra esta venta (Aislamiento)
+        ids = list(carrito_sesion.keys())
+        marcadores = ", ".join(["%s"] * len(ids))
+
+        cursor.execute(
+            f"""
+            SELECT id, nombre, precio, stock
+            FROM productos
+            WHERE id IN ({marcadores})
+            FOR UPDATE
+            """,
+            tuple(ids)
+        )
+
+        productos = {str(producto["id"]): producto for producto in cursor.fetchall()}
+
+        # Validar stock de cada producto (Consistencia)
+        total = 0
+
+        for id_producto, cantidad in carrito_sesion.items():
+
+            producto_bd = productos.get(id_producto)
+
+            if not producto_bd:
+                raise ErrorDeVenta("Un producto de tu carrito ya no existe.")
+
+            if cantidad > producto_bd["stock"]:
+                raise ErrorDeVenta(
+                    f"Solo hay {producto_bd['stock']} pieza(s) de "
+                    f"{producto_bd['nombre']}. Ajusta tu carrito."
+                )
+
+            total += producto_bd["precio"] * cantidad
+
+        # Guardar la venta
+        cursor.execute(
+            """
+            INSERT INTO ventas (vendedor_id, cliente_id, total)
+            VALUES (%s, %s, %s)
+            """,
+            (vendedor_id, cliente_id, total)
+        )
+
+        venta_id = cursor.lastrowid
+
+        # Guardar el detalle y descontar el stock
+        for id_producto, cantidad in carrito_sesion.items():
+
+            producto_bd = productos[id_producto]
+
+            cursor.execute(
+                """
+                INSERT INTO detalle_venta (venta_id, producto_id, cantidad, precio_unitario)
+                VALUES (%s, %s, %s, %s)
+                """,
+                (venta_id, producto_bd["id"], cantidad, producto_bd["precio"])
+            )
+
+            cursor.execute(
+                """
+                UPDATE productos
+                SET stock = stock - %s
+                WHERE id = %s AND stock >= %s
+                """,
+                (cantidad, producto_bd["id"], cantidad)
+            )
+
+            if cursor.rowcount != 1:
+                raise ErrorDeVenta(f"No hay suficiente stock de {producto_bd['nombre']}.")
+
+        # Todo salió bien: se guarda de forma permanente (Durabilidad)
+        database.connection.commit()
+
+        # ---------- FIN DE LA TRANSACCIÓN ----------
+
+    except ErrorDeVenta as error:
+        database.connection.rollback()
+
+        flash(str(error), "error")
+
+        return redirect(url_for("carrito"))
+
+    except MySQLdb.Error as error:
+        database.connection.rollback()
+
+        print("Error al registrar la venta:", error)
+
+        flash("No se pudo completar la compra. No se cobró nada, intenta de nuevo.", "error")
+
+        return redirect(url_for("carrito"))
+
+    finally:
+        if cursor:
+            cursor.close()
+
+    # Vaciar el carrito después de comprar
+    guardar_carrito({})
+
+    flash(f"¡Compra realizada! Tu número de venta es #{venta_id}.", "exito")
+
+    return redirect(url_for("ver_venta", venta_id=venta_id))
+
+
+# =========================
+# TICKET DE UNA VENTA
+# =========================
+
+@app.route("/ventas/<int:venta_id>")
+@login_requerido
+def ver_venta(venta_id):
+
+    try:
+        cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        cursor.execute(
+            """
+            SELECT v.id, v.fecha, v.total, v.cliente_id,
+                   c.nombre AS cliente, c.correo AS cliente_correo,
+                   e.nombre AS vendedor
+            FROM ventas v
+            LEFT JOIN usuarios c ON c.id = v.cliente_id
+            LEFT JOIN usuarios e ON e.id = v.vendedor_id
+            WHERE v.id = %s
+            """,
+            (venta_id,)
+        )
+
+        venta = cursor.fetchone()
+
+        detalle = []
+
+        if venta:
+            cursor.execute(
+                """
+                SELECT p.nombre, p.marca, d.cantidad, d.precio_unitario, d.subtotal
+                FROM detalle_venta d
+                INNER JOIN productos p ON p.id = d.producto_id
+                WHERE d.venta_id = %s
+                ORDER BY d.id
+                """,
+                (venta_id,)
+            )
+
+            detalle = cursor.fetchall()
+
+        cursor.close()
+
+    except MySQLdb.Error as error:
+        print("Error al cargar la venta:", error)
+
+        flash("No se pudo cargar la venta.", "error")
+
+        return redirect(url_for("inicio"))
+
+    # Un cliente solo puede ver sus propias compras
+    if not venta or (not es_personal() and venta["cliente_id"] != session["usuario_id"]):
+        flash("Esa venta no existe o no tienes permiso para verla.", "error")
+
+        return redirect(url_for("inicio"))
+
+    return render_template(
+        "venta.html",
+        venta=venta,
+        detalle=detalle
+    )
 
 
 # =========================

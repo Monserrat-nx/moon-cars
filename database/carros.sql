@@ -115,7 +115,8 @@ CREATE TABLE productos (
 
 CREATE TABLE ventas (
     id           INT            NOT NULL AUTO_INCREMENT,
-    vendedor_id  INT            NOT NULL,
+    vendedor_id  INT            NULL,   -- NULL = compra en línea hecha por el cliente
+                                        -- con valor = venta en mostrador (empleado / admin)
     cliente_id   INT            NULL,
     fecha        DATETIME       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     total        DECIMAL(12,2)  NOT NULL DEFAULT 0,

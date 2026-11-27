@@ -1,0 +1,107 @@
+{% extends "plantilla.html" %}
+
+{% block titulo %}Venta #{{ venta.id }} - Moon-cars{% endblock %}
+
+{% block contenido %}
+
+    <!-- TICKET DE VENTA -->
+
+    <section class="ticket">
+
+        <div class="ticket-encabezado">
+
+            <div>
+                <h2>Venta #{{ venta.id }}</h2>
+
+                <p class="ticket-fecha">
+                    {{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}
+                </p>
+            </div>
+
+            <span class="etiqueta">
+                {% if venta.vendedor %}Venta en mostrador{% else %}Compra en línea{% endif %}
+            </span>
+
+        </div>
+
+
+        <!-- DATOS DE LA VENTA -->
+
+        <div class="ticket-datos">
+
+            <p>
+                <strong>Cliente:</strong>
+                {% if venta.cliente %}
+                    {{ venta.cliente }} ({{ venta.cliente_correo }})
+                {% else %}
+                    Público en general
+                {% endif %}
+            </p>
+
+            {% if venta.vendedor %}
+                <p>
+                    <strong>Atendió:</strong> {{ venta.vendedor }}
+                </p>
+            {% endif %}
+
+        </div>
+
+
+        <!-- PRODUCTOS -->
+
+        <table class="tabla-ticket">
+
+            <tr>
+
+                <th>Producto</th>
+
+                <th>Cantidad</th>
+
+                <th>Precio</th>
+
+                <th>Subtotal</th>
+
+            </tr>
+
+            {% for linea in detalle %}
+
+                <tr>
+
+                    <td data-label="Producto">
+                        {{ linea.nombre }}
+                        <span class="marca">{{ linea.marca }}</span>
+                    </td>
+
+                    <td data-label="Cantidad">{{ linea.cantidad }}</td>
+
+                    <td data-label="Precio">{{ linea.precio_unitario | moneda }}</td>
+
+                    <td data-label="Subtotal">{{ linea.subtotal | moneda }}</td>
+
+                </tr>
+
+            {% endfor %}
+
+        </table>
+
+
+        <p class="ticket-total">
+            Total: <strong>{{ venta.total | moneda }}</strong>
+        </p>
+
+
+        <div class="ticket-acciones">
+
+            <button type="button" class="boton-chico" onclick="window.print()">
+                Imprimir ticket
+            </button>
+
+            <a href="{{ url_for('catalogo') }}" class="boton">
+                Seguir comprando
+            </a>
+
+        </div>
+
+    </section>
+
+{% endblock %}
