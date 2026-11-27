@@ -125,6 +125,29 @@
     color: var(--mc-texto-secundario);
 }
 
+/* Lista de requisitos de la contraseña (registro) */
+.requisitos li {
+    color: #999999;
+
+    margin-bottom: 3px;
+
+    transition: 0.3s;
+}
+
+.requisitos li i {
+    color: #ff5555;
+
+    width: 18px;
+}
+
+.requisitos li.cumple {
+    color: #75b798;
+}
+
+.requisitos li.cumple i {
+    color: #75b798;
+}
+
 
 /* ================================
    ENCABEZADO

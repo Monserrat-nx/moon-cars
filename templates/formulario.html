@@ -21,13 +21,14 @@
             {% endif %}
 
 
-            <form method="POST" id="formRegistro">
+            <!-- novalidate: la validación la muestra Bootstrap (rojo / verde) -->
+            <form method="POST" id="formRegistro" novalidate>
 
                 <div class="mb-3">
 
                     <label for="nombre" class="form-label fw-bold">Nombre completo:</label>
 
-                    <div class="input-group">
+                    <div class="input-group has-validation">
 
                         <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
 
@@ -38,7 +39,12 @@
                             id="nombre"
                             required
                             maxlength="100"
+                            autocomplete="name"
                         >
+
+                        <div class="invalid-feedback">
+                            Escribe tu nombre usando solo letras y espacios.
+                        </div>
 
                     </div>
 
@@ -48,7 +54,7 @@
 
                     <label for="correo" class="form-label fw-bold">Correo electrónico:</label>
 
-                    <div class="input-group">
+                    <div class="input-group has-validation">
 
                         <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
 
@@ -59,7 +65,12 @@
                             id="correo"
                             required
                             maxlength="150"
+                            autocomplete="email"
                         >
+
+                        <div class="invalid-feedback">
+                            Ingresa un correo electrónico válido (ejemplo@correo.com).
+                        </div>
 
                     </div>
 
@@ -69,7 +80,7 @@
 
                     <label for="password" class="form-label fw-bold">Contraseña:</label>
 
-                    <div class="input-group">
+                    <div class="input-group has-validation">
 
                         <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 
@@ -79,17 +90,27 @@
                             name="password"
                             id="password"
                             required
+                            autocomplete="new-password"
                         >
+
+                        <div class="invalid-feedback">
+                            La contraseña todavía no cumple todos los requisitos.
+                        </div>
 
                     </div>
 
                 </div>
 
-                <p class="form-text">
-                    La contraseña debe tener mínimo 8 caracteres,
-                    una mayúscula, una minúscula, un número
-                    y un carácter especial.
-                </p>
+
+                <!-- REQUISITOS DE LA CONTRASEÑA (se palomean mientras escribes) -->
+
+                <ul class="list-unstyled small requisitos" id="requisitos">
+                    <li data-regla="largo"><i class="fa-solid fa-circle-xmark"></i> Mínimo 8 caracteres</li>
+                    <li data-regla="mayuscula"><i class="fa-solid fa-circle-xmark"></i> Una mayúscula</li>
+                    <li data-regla="minuscula"><i class="fa-solid fa-circle-xmark"></i> Una minúscula</li>
+                    <li data-regla="numero"><i class="fa-solid fa-circle-xmark"></i> Un número</li>
+                    <li data-regla="especial"><i class="fa-solid fa-circle-xmark"></i> Un carácter especial (!, #, $, ...)</li>
+                </ul>
 
 
                 <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
@@ -115,60 +136,74 @@
 
 <script>
 
-document.getElementById("formRegistro").addEventListener("submit", function(event) {
+const formRegistro = document.getElementById("formRegistro");
 
-    const nombre = document.getElementById("nombre").value.trim();
-    const correo = document.getElementById("correo").value.trim();
-    const password = document.getElementById("password").value;
+const campoNombre = document.getElementById("nombre");
+const campoCorreo = document.getElementById("correo");
+const campoPassword = document.getElementById("password");
 
-    const nombreRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
+const nombreRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/;
+const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// Las mismas reglas que revisa el servidor en python.py
+const reglasPassword = {
+    largo: (texto) => texto.length >= 8,
+    mayuscula: (texto) => /[A-Z]/.test(texto),
+    minuscula: (texto) => /[a-z]/.test(texto),
+    numero: (texto) => /[0-9]/.test(texto),
+    especial: (texto) => /[^A-Za-z0-9]/.test(texto)
+};
 
-    const mayuscula = /[A-Z]/;
-    const minuscula = /[a-z]/;
-    const numero = /[0-9]/;
-    const especial = /[^A-Za-z0-9]/;
 
+// Marca cada campo como válido o inválido (Bootstrap lo pinta verde o rojo)
+function validarCampos() {
 
-    if (!nombreRegex.test(nombre)) {
+    campoNombre.setCustomValidity(
+        nombreRegex.test(campoNombre.value.trim()) ? "" : "nombre"
+    );
 
-        event.preventDefault();
+    campoCorreo.setCustomValidity(
+        correoRegex.test(campoCorreo.value.trim()) ? "" : "correo"
+    );
 
-        alert("El nombre solo puede contener letras y espacios.");
+    let passwordValida = true;
 
-        return;
+    for (const [regla, cumple] of Object.entries(reglasPassword)) {
+
+        const ok = cumple(campoPassword.value);
+        const elemento = document.querySelector(`[data-regla="${regla}"]`);
+
+        elemento.classList.toggle("cumple", ok);
+
+        elemento.querySelector("i").className = ok
+            ? "fa-solid fa-circle-check"
+            : "fa-solid fa-circle-xmark";
+
+        if (!ok) {
+            passwordValida = false;
+        }
     }
 
-
-    if (!correoRegex.test(correo)) {
-
-        event.preventDefault();
-
-        alert("Ingresa un correo electrónico válido.");
-
-        return;
-    }
+    campoPassword.setCustomValidity(passwordValida ? "" : "password");
+}
 
 
-    if (
-        password.length < 8 ||
-        !mayuscula.test(password) ||
-        !minuscula.test(password) ||
-        !numero.test(password) ||
-        !especial.test(password)
-    ) {
+// Revisar mientras el usuario escribe
+formRegistro.addEventListener("input", validarCampos);
+
+
+// Revisar al enviar: si algo está mal, no se manda y se muestra en rojo
+formRegistro.addEventListener("submit", function(event) {
+
+    validarCampos();
+
+    if (!formRegistro.checkValidity()) {
 
         event.preventDefault();
-
-        alert(
-            "La contraseña debe tener mínimo 8 caracteres, " +
-            "una mayúscula, una minúscula, un número " +
-            "y un carácter especial."
-        );
-
-        return;
+        event.stopPropagation();
     }
+
+    formRegistro.classList.add("was-validated");
 
 });
 

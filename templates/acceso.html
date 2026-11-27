@@ -89,7 +89,7 @@
                 {% endif %}
 
 
-                <form method="POST" action="{{ url_for('login') }}">
+                <form method="POST" action="{{ url_for('login') }}" id="formAcceso" novalidate>
 
                     <div class="mb-3">
 
@@ -97,7 +97,7 @@
                             Correo electrónico:
                         </label>
 
-                        <div class="input-group input-group-lg">
+                        <div class="input-group input-group-lg has-validation">
 
                             <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
 
@@ -113,6 +113,8 @@
                                 {% if not correo %}autofocus{% endif %}
                             >
 
+                            <div class="invalid-feedback">Escribe un correo válido.</div>
+
                         </div>
 
                     </div>
@@ -123,7 +125,7 @@
                             Contraseña:
                         </label>
 
-                        <div class="input-group input-group-lg">
+                        <div class="input-group input-group-lg has-validation">
 
                             <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
 
@@ -147,6 +149,8 @@
                             >
                                 <i class="fa-solid fa-eye"></i>
                             </button>
+
+                            <div class="invalid-feedback">Escribe tu contraseña.</div>
 
                         </div>
 
@@ -196,6 +200,22 @@
 
 
 <script>
+
+// Validación visual de Bootstrap: campos vacíos o correo mal escrito en rojo
+const formAcceso = document.getElementById("formAcceso");
+
+formAcceso.addEventListener("submit", function(event) {
+
+    if (!formAcceso.checkValidity()) {
+
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    formAcceso.classList.add("was-validated");
+
+});
+
 
 // Mostrar / ocultar la contraseña
 const campoPassword = document.getElementById("password");
