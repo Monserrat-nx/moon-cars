@@ -11,25 +11,38 @@
         <h2>Mi Perfil</h2>
 
 
-        {% if usuario %}
+        <h3>{{ usuario.nombre }}</h3>
 
-            <h3>{{ usuario.nombre }}</h3>
+        <span class="etiqueta etiqueta-rol">{{ usuario.rol }}</span>
 
-            <p>
-                Correo: {{ usuario.correo }}
-            </p>
+        <p>
+            Correo: {{ usuario.correo }}
+        </p>
 
-        {% else %}
+        <p>
+            Miembro desde: {{ usuario.fecha_registro.strftime('%d/%m/%Y') }}
+        </p>
 
-            <p>
-                No has iniciado sesión.
-            </p>
 
-            <a href="/login">
-                Iniciar sesión
+        <!-- OPCIONES SEGÚN EL ROL -->
+
+        <div class="perfil-acciones">
+
+            <a href="{{ url_for('catalogo') }}" class="boton">
+                Ver catálogo
             </a>
 
-        {% endif %}
+            {% if usuario.rol == "Administrador" %}
+                <a href="{{ url_for('agregar_producto') }}" class="boton">
+                    Agregar producto
+                </a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" class="boton-eliminar">
+                Cerrar sesión
+            </a>
+
+        </div>
 
     </div>
 

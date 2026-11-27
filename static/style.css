@@ -501,6 +501,30 @@ td img:hover {
     margin: 15px;
 }
 
+.etiqueta-rol {
+    display: inline-block;
+
+    margin-bottom: 10px;
+}
+
+.perfil-acciones {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.perfil-acciones .boton-eliminar {
+    text-decoration: none;
+}
+
 
 /* ================================
    CONTACTO

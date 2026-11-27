@@ -15,9 +15,11 @@
             Da clic en un producto para ver todos sus detalles.
         </p>
 
-        <a href="{{ url_for('agregar_producto') }}" class="boton boton-agregar">
-            + Agregar producto
-        </a>
+        {% if es_admin %}
+            <a href="{{ url_for('agregar_producto') }}" class="boton boton-agregar">
+                + Agregar producto
+            </a>
+        {% endif %}
 
 
         <!-- FILTRO POR CATEGORÍA -->

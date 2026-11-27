@@ -5,6 +5,7 @@ from flask_mysqldb import MySQL
 import MySQLdb
 import MySQLdb.cursors
 from config_server import Config
+from seguridad import login_requerido, rol_requerido, ROL_ADMINISTRADOR, ROL_CLIENTE
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 
@@ -34,36 +35,52 @@ def inicio():
 @app.route("/login", methods=["GET", "POST"])
 def login():
 
+    # Si ya inició sesión, no tiene caso volver a entrar
+    if "usuario_id" in session:
+        return redirect(url_for("perfil"))
+
     mensaje = ""
 
     if request.method == "POST":
 
-        correo = request.form["correo"]
-        password = request.form["password"]
+        correo = request.form.get("correo", "").strip()
+        password = request.form.get("password", "")
 
-        cursor = database.connection.cursor()
+        try:
+            cursor = database.connection.cursor()
 
-        cursor.execute(
-            "SELECT id, nombre, correo, contraseña FROM usuarios WHERE correo = %s",
-            (correo,)
-        )
+            cursor.execute(
+                """
+                SELECT u.id, u.nombre, u.correo, u.contraseña, r.nombre
+                FROM usuarios u
+                INNER JOIN roles r ON r.id = u.rol_id
+                WHERE u.correo = %s
+                """,
+                (correo,)
+            )
 
-        usuario = cursor.fetchone()
+            usuario = cursor.fetchone()
 
-        cursor.close()
+            cursor.close()
+
+        except MySQLdb.Error as error:
+            print("Error al iniciar sesión:", error)
+
+            return render_template(
+                "login.html",
+                mensaje="No se pudo conectar con la base de datos. Intenta más tarde."
+            )
 
         if usuario and check_password_hash(usuario[3], password):
 
-            usuario_data = {
-                "id": usuario[0],
-                "nombre": usuario[1],
-                "correo": usuario[2]
-            }
+            # Guardar los datos del usuario en la sesión
+            session["usuario_id"] = usuario[0]
+            session["nombre"] = usuario[1]
+            session["rol"] = usuario[4]
 
-            return render_template(
-                "perfil.html",
-                usuario=usuario_data
-            )
+            flash(f"Bienvenido(a), {usuario[1]}.", "exito")
+
+            return redirect(url_for("perfil"))
 
         mensaje = "Correo o contraseña incorrectos"
 
@@ -71,6 +88,23 @@ def login():
         "login.html",
         mensaje=mensaje
     )
+
+
+# =========================
+# CERRAR SESIÓN
+# =========================
+
+@app.route("/logout")
+def logout():
+
+    # Se borran solo los datos del usuario; el carrito se conserva
+    session.pop("usuario_id", None)
+    session.pop("nombre", None)
+    session.pop("rol", None)
+
+    flash("Cerraste sesión correctamente.", "exito")
+
+    return redirect(url_for("inicio"))
 
 # =========================
 # REGISTRO
@@ -120,41 +154,54 @@ def formulario():
                 mensaje=mensaje
             )
 
-        # Buscar si el correo ya existe
-        cursor = database.connection.cursor()
+        try:
+            # Buscar si el correo ya existe
+            cursor = database.connection.cursor()
 
-        cursor.execute(
-            "SELECT id FROM usuarios WHERE correo = %s",
-            (correo,)
-        )
+            cursor.execute(
+                "SELECT id FROM usuarios WHERE correo = %s",
+                (correo,)
+            )
 
-        usuario_existente = cursor.fetchone()
+            usuario_existente = cursor.fetchone()
 
-        if usuario_existente:
+            if usuario_existente:
+                cursor.close()
+
+                mensaje = "Este correo ya está registrado"
+
+                return render_template(
+                    "formulario.html",
+                    mensaje=mensaje
+                )
+
+            # Encriptar la contraseña
+            password_hash = generate_password_hash(password)
+
+            # Guardar usuario en MariaDB (todos los registros nuevos son Clientes)
+            cursor.execute(
+                """
+                INSERT INTO usuarios (nombre, correo, contraseña, rol_id)
+                VALUES (%s, %s, %s, (SELECT id FROM roles WHERE nombre = %s))
+                """,
+                (nombre, correo, password_hash, ROL_CLIENTE)
+            )
+
+            database.connection.commit()
+
             cursor.close()
 
-            mensaje = "Este correo ya está registrado"
+        except MySQLdb.Error as error:
+            database.connection.rollback()
+
+            print("Error al registrar usuario:", error)
 
             return render_template(
                 "formulario.html",
-                mensaje=mensaje
+                mensaje="No se pudo crear la cuenta. Intenta más tarde."
             )
 
-        # Encriptar la contraseña
-        password_hash = generate_password_hash(password)
-
-        # Guardar usuario en MariaDB
-        cursor.execute(
-            """
-            INSERT INTO usuarios (nombre, correo, contraseña)
-            VALUES (%s, %s, %s)
-            """,
-            (nombre, correo, password_hash)
-        )
-
-        database.connection.commit()
-
-        cursor.close()
+        flash("Cuenta creada correctamente. Ya puedes iniciar sesión.", "exito")
 
         return redirect(url_for("login"))
 
@@ -168,9 +215,41 @@ def formulario():
 # =========================
 
 @app.route("/perfil")
+@login_requerido
 def perfil():
 
-    return render_template("perfil.html")
+    try:
+        cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        cursor.execute(
+            """
+            SELECT u.nombre, u.correo, u.fecha_registro, r.nombre AS rol
+            FROM usuarios u
+            INNER JOIN roles r ON r.id = u.rol_id
+            WHERE u.id = %s
+            """,
+            (session["usuario_id"],)
+        )
+
+        usuario = cursor.fetchone()
+
+        cursor.close()
+
+    except MySQLdb.Error as error:
+        print("Error al cargar el perfil:", error)
+
+        flash("No se pudo cargar tu perfil.", "error")
+
+        return redirect(url_for("inicio"))
+
+    # Si el usuario ya no existe en la BD, se cierra la sesión
+    if not usuario:
+        return redirect(url_for("logout"))
+
+    return render_template(
+        "perfil.html",
+        usuario=usuario
+    )
 
 
 # =========================
@@ -238,7 +317,10 @@ def moneda(valor):
 @app.context_processor
 def datos_globales():
 
-    return {"cantidad_carrito": contar_carrito()}
+    return {
+        "cantidad_carrito": contar_carrito(),
+        "es_admin": session.get("rol") == ROL_ADMINISTRADOR
+    }
 
 
 # =========================
@@ -620,6 +702,7 @@ def obtener_categorias():
 
 
 @app.route("/productos/agregar", methods=["GET", "POST"])
+@rol_requerido(ROL_ADMINISTRADOR)
 def agregar_producto():
 
     try:
