@@ -1469,6 +1469,188 @@ td img:hover {
 
 
 /* ================================
+   FINALIZAR COMPRA
+================================ */
+
+.carrito-compra {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-top: 20px;
+}
+
+.carrito-compra form {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+}
+
+.carrito-compra p {
+    color: #cccccc;
+
+    align-self: center;
+
+    margin-right: 15px;
+}
+
+.carrito-compra label {
+    font-weight: bold;
+}
+
+.carrito-compra select {
+    padding: 12px;
+
+    min-width: 260px;
+
+    background: #292929;
+
+    color: white;
+
+    border: 1px solid #444444;
+
+    border-radius: 7px;
+
+    outline: none;
+}
+
+.carrito-compra select:focus {
+    border-color: #e00000;
+}
+
+.boton-comprar {
+    padding: 15px 30px;
+
+    font-size: 17px;
+}
+
+.boton-comprar:disabled {
+    background: #555555;
+
+    cursor: wait;
+
+    transform: none;
+}
+
+.boton-seguir {
+    display: inline-block;
+
+    text-decoration: none;
+
+    text-align: center;
+}
+
+
+/* ================================
+   TICKET DE VENTA
+================================ */
+
+.ticket {
+    max-width: 800px;
+
+    margin: 45px auto 0;
+
+    padding: 35px;
+
+    background: #1b1b1b;
+
+    border-radius: 15px;
+
+    box-shadow: 0 10px 35px rgba(0,0,0,0.5);
+}
+
+.ticket-encabezado {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 15px;
+
+    margin-bottom: 20px;
+}
+
+.ticket-fecha {
+    color: #999999;
+}
+
+.ticket-datos {
+    padding: 15px 20px;
+
+    margin-bottom: 20px;
+
+    background: #252525;
+
+    border-radius: 10px;
+}
+
+.ticket-datos p {
+    color: #dddddd;
+
+    margin: 5px 0;
+}
+
+.tabla-ticket td .marca {
+    display: block;
+}
+
+.ticket-total {
+    margin-top: 20px;
+
+    font-size: 24px;
+
+    text-align: right;
+}
+
+.ticket-total strong {
+    color: #ff1a1a;
+}
+
+.ticket-acciones {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+/* Al imprimir solo sale el ticket */
+@media print {
+
+    header,
+    nav,
+    footer,
+    .mensajes,
+    .ticket-acciones {
+        display: none !important;
+    }
+
+    body,
+    .ticket {
+        background: white;
+
+        color: black;
+
+        box-shadow: none;
+    }
+
+}
+
+
+/* ================================
    FOOTER
 ================================ */
 
@@ -1821,6 +2003,221 @@ footer {
 
     .tabla-carrito tr {
         margin-bottom: 0;
+    }
+
+}
+
+/* ================================
+   COMPRA Y TICKET EN CELULAR
+================================ */
+
+@media (max-width: 700px) {
+
+    .carrito-compra,
+    .carrito-compra form {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+    .carrito-compra p {
+        margin: 0 0 10px;
+
+        text-align: center;
+    }
+
+    .carrito-compra select {
+        min-width: 0;
+
+        width: 100%;
+    }
+
+    .boton-comprar {
+        width: 100%;
+    }
+
+    .ticket {
+        padding: 20px 15px;
+    }
+
+    /* Ticket: cada producto en forma de tarjeta */
+    .tabla-ticket,
+    .tabla-ticket tbody,
+    .tabla-ticket tr,
+    .tabla-ticket td {
+        display: block;
+
+        width: 100%;
+    }
+
+    .tabla-ticket tr:first-child {
+        display: none;
+    }
+
+    .tabla-ticket tr {
+        background: #252525;
+
+        border-radius: 10px;
+
+        margin-bottom: 10px;
+
+        padding: 8px 0;
+    }
+
+    .tabla-ticket td {
+        display: flex;
+
+        justify-content: space-between;
+
+        gap: 10px;
+
+        padding: 6px 15px;
+
+        border-bottom: none;
+
+        text-align: right;
+    }
+
+    .tabla-ticket td::before {
+        content: attr(data-label);
+
+        color: #999999;
+
+        font-weight: bold;
+
+        text-align: left;
+    }
+
+    .tabla-ticket td .marca {
+        display: inline;
+
+        margin-left: 5px;
+    }
+
+    .ticket-total {
+        text-align: center;
+    }
+
+    .ticket-acciones {
+        flex-direction: column;
+    }
+
+    .ticket-acciones .boton,
+    .ticket-acciones button {
+        width: 100%;
+    }
+
+}
+
+
+/* ================================
+   HISTORIAL DE VENTAS / MIS COMPRAS
+================================ */
+
+.resumen-ventas {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+.resumen-tarjeta {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 20px 25px;
+
+    background: #1b1b1b;
+
+    border-left: 4px solid #e00000;
+
+    border-radius: 10px;
+}
+
+.resumen-tarjeta span {
+    color: #999999;
+
+    font-size: 14px;
+}
+
+.resumen-tarjeta strong {
+    color: white;
+
+    font-size: 26px;
+}
+
+.tabla-historial .boton-chico {
+    display: inline-block;
+
+    text-decoration: none;
+}
+
+@media (max-width: 800px) {
+
+    /* Cada venta en forma de tarjeta */
+    .tabla-historial,
+    .tabla-historial tbody,
+    .tabla-historial tr,
+    .tabla-historial td {
+        display: block;
+
+        width: 100%;
+    }
+
+    .tabla-historial {
+        background: transparent;
+
+        box-shadow: none;
+    }
+
+    .tabla-historial tr:first-child {
+        display: none;
+    }
+
+    .tabla-historial tr {
+        background: #1b1b1b;
+
+        border-radius: 10px;
+
+        margin-bottom: 12px;
+
+        padding: 8px 0;
+    }
+
+    .tabla-historial td {
+        display: flex;
+
+        justify-content: space-between;
+
+        gap: 10px;
+
+        padding: 6px 15px;
+
+        border-bottom: none;
+
+        text-align: right;
+    }
+
+    .tabla-historial td[data-label]::before {
+        content: attr(data-label);
+
+        color: #999999;
+
+        font-weight: bold;
+
+        text-align: left;
+    }
+
+    .tabla-historial .celda-quitar .boton-chico {
+        width: 100%;
+
+        text-align: center;
     }
 
 }

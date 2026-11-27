@@ -38,6 +38,16 @@
                 </a>
             {% endif %}
 
+            {% if es_personal %}
+                <a href="{{ url_for('ventas') }}" class="boton">
+                    Ver ventas
+                </a>
+            {% else %}
+                <a href="{{ url_for('mis_compras') }}" class="boton">
+                    Mis compras
+                </a>
+            {% endif %}
+
             <a href="{{ url_for('logout') }}" class="boton-eliminar">
                 Cerrar sesión
             </a>

@@ -1,0 +1,100 @@
+{% extends "plantilla.html" %}
+
+{% block titulo %}{{ titulo }} - Moon-cars{% endblock %}
+
+{% block contenido %}
+
+    <!-- HISTORIAL DE VENTAS / MIS COMPRAS -->
+
+    <section class="historial">
+
+        <h2>{{ titulo }}</h2>
+
+
+        <!-- RESUMEN -->
+
+        <div class="resumen-ventas">
+
+            <div class="resumen-tarjeta">
+                <span>{% if es_historial %}Ventas registradas{% else %}Compras realizadas{% endif %}</span>
+                <strong>{{ ventas | length }}</strong>
+            </div>
+
+            <div class="resumen-tarjeta">
+                <span>{% if es_historial %}Total vendido{% else %}Total gastado{% endif %}</span>
+                <strong>{{ total_vendido | moneda }}</strong>
+            </div>
+
+        </div>
+
+
+        {% if ventas %}
+
+            <table class="tabla-historial">
+
+                <tr>
+
+                    <th>Venta</th>
+
+                    <th>Fecha</th>
+
+                    {% if es_historial %}
+                        <th>Cliente</th>
+
+                        <th>Atendió</th>
+                    {% endif %}
+
+                    <th>Piezas</th>
+
+                    <th>Total</th>
+
+                    <th></th>
+
+                </tr>
+
+
+                {% for venta in ventas %}
+
+                    <tr>
+
+                        <td data-label="Venta">#{{ venta.id }}</td>
+
+                        <td data-label="Fecha">{{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+
+                        {% if es_historial %}
+                            <td data-label="Cliente">{{ venta.cliente or "Público en general" }}</td>
+
+                            <td data-label="Atendió">{{ venta.vendedor or "Compra en línea" }}</td>
+                        {% endif %}
+
+                        <td data-label="Piezas">{{ venta.piezas }}</td>
+
+                        <td data-label="Total">{{ venta.total | moneda }}</td>
+
+                        <td class="celda-quitar">
+                            <a href="{{ url_for('ver_venta', venta_id=venta.id) }}" class="boton-chico">
+                                Ver ticket
+                            </a>
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </table>
+
+        {% else %}
+
+            <p class="vacio">
+                {% if es_historial %}Todavía no hay ventas registradas.{% else %}Todavía no has hecho ninguna compra.{% endif %}
+            </p>
+
+            <a href="{{ url_for('catalogo') }}" class="boton">
+                Ir al catálogo
+            </a>
+
+        {% endif %}
+
+    </section>
+
+{% endblock %}

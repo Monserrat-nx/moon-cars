@@ -62,6 +62,17 @@
                 </li>
             {% endif %}
 
+            <!-- Admin y empleado ven todas las ventas; el cliente sus compras -->
+            {% if es_personal %}
+                <li>
+                    <a href="{{ url_for('ventas') }}">Ventas</a>
+                </li>
+            {% elif session.usuario_id %}
+                <li>
+                    <a href="{{ url_for('mis_compras') }}">Mis compras</a>
+                </li>
+            {% endif %}
+
             <li>
                 <a href="/contacto">Contacto</a>
             </li>
