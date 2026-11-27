@@ -1,67 +1,36 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "plantilla.html" %}
 
-<head>
+{% block titulo %}Perfil - Moon-cars{% endblock %}
 
-    <meta charset="UTF-8">
+{% block contenido %}
 
-    <title>Perfil - Moon-cars</title>
+    <!-- PERFIL -->
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <div class="perfil">
 
-</head>
-
-<body>
-
-<header>
-
-    <h1>Moon-cars </h1>
-
-</header>
+        <h2>Mi Perfil</h2>
 
 
-<nav>
+        {% if usuario %}
 
-    <ul>
+            <h3>{{ usuario.nombre }}</h3>
 
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/contacto">Contacto</a></li>
-        <li><a href="/login">Login</a></li>
+            <p>
+                Correo: {{ usuario.correo }}
+            </p>
 
-    </ul>
+        {% else %}
 
-</nav>
+            <p>
+                No has iniciado sesión.
+            </p>
 
+            <a href="/login">
+                Iniciar sesión
+            </a>
 
-<div class="perfil">
+        {% endif %}
 
-    <h2>Mi Perfil</h2>
+    </div>
 
-
-    {% if usuario %}
-
-        <h3>{{ usuario.nombre }}</h3>
-
-        <p>
-            Correo: {{ usuario.correo }}
-        </p>
-
-    {% else %}
-
-        <p>
-            No has iniciado sesión.
-        </p>
-
-        <a href="/login">
-            Iniciar sesión
-        </a>
-
-    {% endif %}
-
-</div>
-
-
-</body>
-
-</html>
+{% endblock %}

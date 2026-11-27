@@ -1,42 +1,41 @@
+{% extends "plantilla.html" %}
 
-<section class="contacto">
+{% block titulo %}Acerca de - Moon-cars{% endblock %}
 
-    <h2>Acerca de Moon-cars</h2>
+{% block contenido %}
 
-    <p>
-        Moon-cars es un proyecto dedicado a la
-        venta de automóviles y refacciones.
-    </p>
+    <!-- ACERCA DE -->
 
-    <br>
+    <section class="contacto">
 
-    <p>
-        Nuestro objetivo es ofrecer una página
-        sencilla donde los usuarios puedan
-        consultar diferentes vehículos y
-        productos para sus automóviles.
-    </p>
+        <h2>Acerca de Moon-cars</h2>
 
-    <br>
+        <p>
+            Moon-cars es un proyecto dedicado a la
+            venta de automóviles y refacciones.
+        </p>
 
-    <h3>¿Qué ofrecemos?</h3>
+        <p>
+            Nuestro objetivo es ofrecer una página
+            sencilla donde los usuarios puedan
+            consultar diferentes vehículos y
+            productos para sus automóviles.
+        </p>
 
-    <br>
+        <h3>¿Qué ofrecemos?</h3>
 
-    <p>
-         Automóviles
-    </p>
+        <div class="datos-contacto">
 
-    <p>
-        Refracciones
-    </p>
+            <p>Automóviles</p>
 
-    <p>
-        Registro de usuarios
-    </p>
+            <p>Refacciones</p>
 
-    <p>
-         Inicio de sesión
-    </p>
+            <p>Registro de usuarios</p>
 
-</section>
+            <p>Inicio de sesión</p>
+
+        </div>
+
+    </section>
+
+{% endblock %}

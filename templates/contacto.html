@@ -1,60 +1,30 @@
-<!DOCTYPE html>
-<html lang="es">
+{% extends "plantilla.html" %}
 
-<head>
+{% block titulo %}Contacto - Moon-cars{% endblock %}
 
-    <meta charset="UTF-8">
+{% block contenido %}
 
-    <title>Contacto - Moon-cars</title>
+    <!-- CONTACTO -->
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <div class="contacto">
 
-</head>
+        <h2>Contacto</h2>
 
-<body>
+        <p>
+            ¿Tienes alguna pregunta?
+            Comunícate con nosotros.
+        </p>
 
-<header>
+        <div class="datos-contacto">
 
-    <h1> Moon-cars</h1>
+            <p>Teléfono: 442-123-4567</p>
 
-</header>
+            <p>Correo: contacto@autopartsmx.com</p>
 
+            <p>Querétaro, México</p>
 
-<nav>
+        </div>
 
-    <ul>
+    </div>
 
-        <li><a href="/">Inicio</a></li>
-        <li><a href="/login">Login</a></li>
-        <li><a href="/formulario">Registrarse</a></li>
-        <li><a href="/perfil">Perfil</a></li>
-
-    </ul>
-
-</nav>
-
-
-<div class="contacto">
-
-    <h2>Contacto</h2>
-
-    <p>
-        ¿Tienes alguna pregunta?
-        Comunícate con nosotros.
-    </p>
-
-    <br>
-
-    <p>Teléfono: 442-123-4567</p>
-
-    <p>Correo: contacto@autopartsmx.com</p>
-
-    <p>Querétaro, México</p>
-
-</div>
-
-
-</body>
-
-</html>
+{% endblock %}
