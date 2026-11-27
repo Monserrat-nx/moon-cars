@@ -348,9 +348,58 @@ def imagen_a_base64(imagen, tipo):
 
 def obtener_carrito():
     """Regresa el carrito guardado en la sesión.
-    Formato: { "id_producto": cantidad }"""
+    Formato: { "id_producto": cantidad }
 
-    return session.get("carrito", {})
+    Programación defensiva: solo se aceptan ids formados por dígitos
+    y cantidades enteras mayores a 0. Cualquier otra cosa se descarta
+    antes de que llegue a una consulta SQL."""
+
+    carrito = session.get("carrito", {})
+
+    if not isinstance(carrito, dict):
+        return {}
+
+    return {
+        str(id_producto): cantidad
+        for id_producto, cantidad in carrito.items()
+        if str(id_producto).isdigit()
+        and isinstance(cantidad, int)
+        and cantidad > 0
+    }
+
+
+# =========================
+# PREVENCIÓN DE SQL INJECTION
+# =========================
+#
+# Regla del proyecto: NUNCA se pega texto del usuario dentro del SQL.
+# Todos los valores viajan como parámetros (%s) en cursor.execute(sql, valores)
+# y el conector MySQLdb los escapa. Lo único que se arma en Python son
+# los marcadores "%s, %s, %s" de un IN (...), y eso lo hacen estas funciones
+# a partir de una lista de enteros ya validados.
+
+def ids_enteros(ids):
+    """Convierte una lista de ids a enteros positivos.
+    Lanza ValueError si alguno no es un número entero válido."""
+
+    resultado = []
+
+    for valor in ids:
+
+        texto = str(valor)
+
+        if not texto.isdigit() or int(texto) <= 0:
+            raise ValueError(f"Id no válido: {texto!r}")
+
+        resultado.append(int(texto))
+
+    return resultado
+
+
+def marcadores_in(cantidad):
+    """Regresa "%s, %s, %s" con tantos marcadores como valores lleve el IN."""
+
+    return ", ".join(["%s"] * cantidad)
 
 
 def guardar_carrito(carrito):
@@ -407,23 +456,19 @@ def catalogo():
 
         categorias = cursor.fetchall()
 
-        # Consulta parametrizada; el filtro de categoría es opcional
-        consulta = """
+        # Consulta parametrizada y FIJA (no se concatena texto):
+        # si categoria_id es None (NULL) se muestran todas las categorías.
+        cursor.execute(
+            """
             SELECT p.id, p.nombre, p.marca, p.precio, p.stock,
                    p.imagen, p.imagen_tipo, c.nombre AS categoria
             FROM productos p
             INNER JOIN categorias c ON c.id = p.categoria_id
-        """
-
-        parametros = ()
-
-        if categoria_id:
-            consulta += " WHERE p.categoria_id = %s"
-            parametros = (categoria_id,)
-
-        consulta += " ORDER BY c.nombre, p.nombre"
-
-        cursor.execute(consulta, parametros)
+            WHERE (%s IS NULL OR p.categoria_id = %s)
+            ORDER BY c.nombre, p.nombre
+            """,
+            (categoria_id, categoria_id)
+        )
 
         productos = cursor.fetchall()
 
@@ -518,15 +563,15 @@ def carrito():
         try:
             cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
 
-            # Un %s por cada producto del carrito (sigue siendo parametrizada)
-            ids = list(carrito_sesion.keys())
-            marcadores = ", ".join(["%s"] * len(ids))
+            # Un %s por cada producto del carrito: los ids viajan como
+            # parámetros, en el texto SQL solo se ponen los marcadores
+            ids = ids_enteros(carrito_sesion.keys())
 
             cursor.execute(
                 f"""
                 SELECT id, nombre, marca, precio, stock, imagen, imagen_tipo
                 FROM productos
-                WHERE id IN ({marcadores})
+                WHERE id IN ({marcadores_in(len(ids))})
                 """,
                 tuple(ids)
             )
@@ -537,7 +582,7 @@ def carrito():
 
             carga_correcta = True
 
-        except MySQLdb.Error as error:
+        except (MySQLdb.Error, ValueError) as error:
             print("Error al cargar el carrito:", error)
 
             flash("No se pudo cargar el carrito.", "error")
@@ -810,14 +855,13 @@ def comprar():
 
         # Bloquear los productos del carrito (FOR UPDATE) para que nadie
         # más cambie su stock mientras se registra esta venta (Aislamiento)
-        ids = list(carrito_sesion.keys())
-        marcadores = ", ".join(["%s"] * len(ids))
+        ids = ids_enteros(carrito_sesion.keys())
 
         cursor.execute(
             f"""
             SELECT id, nombre, precio, stock
             FROM productos
-            WHERE id IN ({marcadores})
+            WHERE id IN ({marcadores_in(len(ids))})
             FOR UPDATE
             """,
             tuple(ids)
@@ -884,7 +928,7 @@ def comprar():
 
         # ---------- FIN DE LA TRANSACCIÓN ----------
 
-    except ErrorDeVenta as error:
+    except (ErrorDeVenta, ValueError) as error:
         database.connection.rollback()
 
         flash(str(error), "error")
@@ -916,29 +960,32 @@ def comprar():
 # HISTORIAL DE VENTAS
 # =========================
 
-# Consulta base del historial: cada venta con su cliente, vendedor
-# y cuántas piezas lleva (se le agrega el WHERE según quién la pide)
-CONSULTA_VENTAS = """
-    SELECT v.id, v.fecha, v.total,
-           c.nombre AS cliente,
-           e.nombre AS vendedor,
-           COALESCE(SUM(d.cantidad), 0) AS piezas
-    FROM ventas v
-    LEFT JOIN usuarios c ON c.id = v.cliente_id
-    LEFT JOIN usuarios e ON e.id = v.vendedor_id
-    LEFT JOIN detalle_venta d ON d.venta_id = v.id
-    {filtro}
-    GROUP BY v.id, v.fecha, v.total, c.nombre, e.nombre
-    ORDER BY v.fecha DESC, v.id DESC
-"""
+def consultar_ventas(cliente_id=None):
+    """Regresa la lista de ventas con su cliente, vendedor y piezas.
 
+    cliente_id = None  -> todas las ventas (historial del personal)
+    cliente_id = 5     -> solo las compras del cliente 5 (Mis compras)
 
-def consultar_ventas(filtro="", parametros=()):
-    """Regresa la lista de ventas; filtro es un WHERE con %s (parametrizado)."""
+    La consulta es FIJA y parametrizada: el filtro viaja como %s."""
 
     cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
 
-    cursor.execute(CONSULTA_VENTAS.format(filtro=filtro), parametros)
+    cursor.execute(
+        """
+        SELECT v.id, v.fecha, v.total,
+               c.nombre AS cliente,
+               e.nombre AS vendedor,
+               COALESCE(SUM(d.cantidad), 0) AS piezas
+        FROM ventas v
+        LEFT JOIN usuarios c ON c.id = v.cliente_id
+        LEFT JOIN usuarios e ON e.id = v.vendedor_id
+        LEFT JOIN detalle_venta d ON d.venta_id = v.id
+        WHERE (%s IS NULL OR v.cliente_id = %s)
+        GROUP BY v.id, v.fecha, v.total, c.nombre, e.nombre
+        ORDER BY v.fecha DESC, v.id DESC
+        """,
+        (cliente_id, cliente_id)
+    )
 
     ventas = cursor.fetchall()
 
@@ -975,10 +1022,7 @@ def ventas():
 def mis_compras():
 
     try:
-        lista_ventas = consultar_ventas(
-            "WHERE v.cliente_id = %s",
-            (session["usuario_id"],)
-        )
+        lista_ventas = consultar_ventas(cliente_id=session["usuario_id"])
 
     except MySQLdb.Error as error:
         print("Error al cargar las compras:", error)
