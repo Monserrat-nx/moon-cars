@@ -13,7 +13,7 @@
 
         {% if articulos %}
 
-            <table>
+            <table class="tabla-carrito">
 
                 <tr>
 
@@ -36,7 +36,7 @@
 
                     <tr>
 
-                        <td>
+                        <td class="celda-imagen">
 
                             {% if articulo.imagen_base64 %}
                                 <img
@@ -49,7 +49,7 @@
 
                         </td>
 
-                        <td>
+                        <td data-label="Producto">
 
                             <a href="{{ url_for('producto', producto_id=articulo.id) }}">
                                 {{ articulo.nombre }}
@@ -59,9 +59,9 @@
 
                         </td>
 
-                        <td>{{ articulo.precio | moneda }}</td>
+                        <td data-label="Precio">{{ articulo.precio | moneda }}</td>
 
-                        <td>
+                        <td data-label="Cantidad">
 
                             <form method="POST"
                                   action="{{ url_for('actualizar_carrito', producto_id=articulo.id) }}"
@@ -84,9 +84,9 @@
 
                         </td>
 
-                        <td>{{ articulo.subtotal | moneda }}</td>
+                        <td data-label="Subtotal">{{ articulo.subtotal | moneda }}</td>
 
-                        <td>
+                        <td class="celda-quitar">
 
                             <form method="POST"
                                   action="{{ url_for('eliminar_carrito', producto_id=articulo.id) }}">
