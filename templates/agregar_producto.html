@@ -6,140 +6,210 @@
 
     <!-- AGREGAR PRODUCTO -->
 
-    <div class="formulario formulario-producto">
+    <div class="card tarjeta-mc tarjeta-formulario tarjeta-formulario-ancha">
 
-        <h2>Agregar producto</h2>
+        <div class="card-body p-4 p-md-5">
 
-
-        <form method="POST"
-              enctype="multipart/form-data"
-              id="formProducto">
-
-            <label for="nombre">Nombre del producto:</label>
-
-            <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                value="{{ datos.nombre or '' }}"
-                placeholder="Ej. Mustang GT"
-                maxlength="100"
-                required
-            >
+            <h2 class="text-center titulo-formulario">
+                <i class="fa-solid fa-box-open"></i> Agregar producto
+            </h2>
 
 
-            <label for="marca">Marca:</label>
+            <form method="POST"
+                  enctype="multipart/form-data"
+                  id="formProducto"
+                  novalidate>
 
-            <input
-                type="text"
-                id="marca"
-                name="marca"
-                value="{{ datos.marca or '' }}"
-                placeholder="Ej. Ford"
-                maxlength="60"
-                required
-            >
+                <div class="mb-3">
 
-
-            <label for="categoria_id">Categoría:</label>
-
-            <select id="categoria_id" name="categoria_id" required>
-
-                <option value="">Selecciona una categoría</option>
-
-                {% for categoria in categorias %}
-
-                    <option
-                        value="{{ categoria.id }}"
-                        {% if datos.categoria_id == categoria.id|string %}selected{% endif %}
-                    >
-                        {{ categoria.nombre }}
-                    </option>
-
-                {% endfor %}
-
-            </select>
-
-
-            <div class="campos-dobles">
-
-                <div>
-
-                    <label for="precio">Precio (MXN):</label>
+                    <label for="nombre" class="form-label fw-bold">Nombre del producto:</label>
 
                     <input
-                        type="number"
-                        id="precio"
-                        name="precio"
-                        value="{{ datos.precio or '' }}"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
+                        type="text"
+                        class="form-control"
+                        id="nombre"
+                        name="nombre"
+                        value="{{ datos.nombre or '' }}"
+                        placeholder="Ej. Mustang GT"
+                        maxlength="100"
                         required
                     >
 
+                    <div class="invalid-feedback">El nombre es obligatorio.</div>
+
                 </div>
 
-                <div>
 
-                    <label for="stock">Stock:</label>
+                <div class="row g-3 mb-3">
+
+                    <div class="col-md-6">
+
+                        <label for="marca" class="form-label fw-bold">Marca:</label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="marca"
+                            name="marca"
+                            value="{{ datos.marca or '' }}"
+                            placeholder="Ej. Ford"
+                            maxlength="60"
+                            required
+                        >
+
+                        <div class="invalid-feedback">La marca es obligatoria.</div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label for="categoria_id" class="form-label fw-bold">Categoría:</label>
+
+                        <select id="categoria_id" name="categoria_id" class="form-select" required>
+
+                            <option value="">Selecciona una categoría</option>
+
+                            {% for categoria in categorias %}
+
+                                <option
+                                    value="{{ categoria.id }}"
+                                    {% if datos.categoria_id == categoria.id|string %}selected{% endif %}
+                                >
+                                    {{ categoria.nombre }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                        <div class="invalid-feedback">Selecciona una categoría.</div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="row g-3 mb-3">
+
+                    <div class="col-md-6">
+
+                        <label for="precio" class="form-label fw-bold">Precio (MXN):</label>
+
+                        <div class="input-group has-validation">
+
+                            <span class="input-group-text">$</span>
+
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="precio"
+                                name="precio"
+                                value="{{ datos.precio or '' }}"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                required
+                            >
+
+                            <div class="invalid-feedback">El precio debe ser un número mayor o igual a 0.</div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <label for="stock" class="form-label fw-bold">Stock:</label>
+
+                        <div class="input-group has-validation">
+
+                            <span class="input-group-text"><i class="fa-solid fa-boxes-stacked"></i></span>
+
+                            <input
+                                type="number"
+                                class="form-control"
+                                id="stock"
+                                name="stock"
+                                value="{{ datos.stock or '' }}"
+                                min="0"
+                                step="1"
+                                placeholder="0"
+                                required
+                            >
+
+                            <div class="invalid-feedback">El stock debe ser un número entero mayor o igual a 0.</div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label for="descripcion" class="form-label fw-bold">Descripción:</label>
+
+                    <textarea
+                        class="form-control"
+                        id="descripcion"
+                        name="descripcion"
+                        rows="4"
+                        placeholder="Características del producto"
+                    >{{ datos.descripcion or '' }}</textarea>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label for="imagen" class="form-label fw-bold">
+                        Imagen (JPG, PNG, GIF o WEBP, máx. 2 MB):
+                    </label>
 
                     <input
-                        type="number"
-                        id="stock"
-                        name="stock"
-                        value="{{ datos.stock or '' }}"
-                        min="0"
-                        step="1"
-                        placeholder="0"
-                        required
+                        type="file"
+                        class="form-control"
+                        id="imagen"
+                        name="imagen"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
                     >
+
+                    <div class="invalid-feedback">La imagen debe pesar máximo 2 MB.</div>
 
                 </div>
 
-            </div>
+
+                <!-- VISTA PREVIA DE LA IMAGEN -->
+
+                <div class="vista-previa" id="vistaPrevia">
+                    <span class="sin-imagen">
+                        <i class="fa-regular fa-image fa-2x"></i><br>Sin imagen seleccionada
+                    </span>
+                </div>
 
 
-            <label for="descripcion">Descripción:</label>
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-4">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar producto
+                </button>
 
-            <textarea
-                id="descripcion"
-                name="descripcion"
-                rows="4"
-                placeholder="Características del producto"
-            >{{ datos.descripcion or '' }}</textarea>
+            </form>
 
 
-            <label for="imagen">Imagen (JPG, PNG, GIF o WEBP, máx. 2 MB):</label>
+            <p class="text-center mt-4 mb-0">
+                <a href="{{ url_for('catalogo') }}">
+                    <i class="fa-solid fa-arrow-left"></i> Volver al catálogo
+                </a>
+            </p>
 
-            <input
-                type="file"
-                id="imagen"
-                name="imagen"
-                accept="image/jpeg,image/png,image/gif,image/webp"
-            >
-
-
-            <!-- VISTA PREVIA DE LA IMAGEN -->
-
-            <div class="vista-previa" id="vistaPrevia">
-                <span class="sin-imagen">Sin imagen seleccionada</span>
-            </div>
-
-
-            <button type="submit">
-                Guardar producto
-            </button>
-
-        </form>
-
-
-        <p>
-            <a href="{{ url_for('catalogo') }}">Volver al catálogo</a>
-        </p>
+        </div>
 
     </div>
 
+{% endblock %}
+
+
+{% block scripts %}
 
 <script>
 
@@ -147,6 +217,8 @@ const campoImagen = document.getElementById("imagen");
 const vistaPrevia = document.getElementById("vistaPrevia");
 
 const TAMANO_MAXIMO = 2 * 1024 * 1024;
+
+const SIN_IMAGEN = '<span class="sin-imagen"><i class="fa-regular fa-image fa-2x"></i><br>Sin imagen seleccionada</span>';
 
 
 // Mostrar la imagen antes de subirla
@@ -156,21 +228,26 @@ campoImagen.addEventListener("change", function() {
 
     if (!archivo) {
 
-        vistaPrevia.innerHTML = '<span class="sin-imagen">Sin imagen seleccionada</span>';
+        vistaPrevia.innerHTML = SIN_IMAGEN;
 
         return;
     }
 
+    // Imagen muy grande: el campo se marca en rojo con su mensaje
     if (archivo.size > TAMANO_MAXIMO) {
 
-        alert("La imagen es muy grande. El máximo es 2 MB.");
+        campoImagen.setCustomValidity("muy grande");
 
-        campoImagen.value = "";
+        campoImagen.classList.add("is-invalid");
 
-        vistaPrevia.innerHTML = '<span class="sin-imagen">Sin imagen seleccionada</span>';
+        vistaPrevia.innerHTML = SIN_IMAGEN;
 
         return;
     }
+
+    campoImagen.setCustomValidity("");
+
+    campoImagen.classList.remove("is-invalid");
 
     const lector = new FileReader();
 
@@ -191,29 +268,25 @@ campoImagen.addEventListener("change", function() {
 });
 
 
-// Validar antes de enviar
-document.getElementById("formProducto").addEventListener("submit", function(event) {
+// Validar antes de enviar (Bootstrap pinta en rojo / verde cada campo)
+const formProducto = document.getElementById("formProducto");
 
-    const precio = parseFloat(document.getElementById("precio").value);
-    const stock = Number(document.getElementById("stock").value);
+formProducto.addEventListener("submit", function(event) {
 
-    if (isNaN(precio) || precio < 0) {
+    const stock = document.getElementById("stock");
 
-        event.preventDefault();
+    // El stock debe ser entero (el navegador acepta "2.5" en type=number con step=1 a veces)
+    stock.setCustomValidity(
+        Number.isInteger(Number(stock.value)) ? "" : "entero"
+    );
 
-        alert("El precio debe ser un número mayor o igual a 0.");
-
-        return;
-    }
-
-    if (!Number.isInteger(stock) || stock < 0) {
+    if (!formProducto.checkValidity()) {
 
         event.preventDefault();
-
-        alert("El stock debe ser un número entero mayor o igual a 0.");
-
-        return;
+        event.stopPropagation();
     }
+
+    formProducto.classList.add("was-validated");
 
 });
 

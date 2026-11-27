@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 
 <head>
 
@@ -9,6 +9,18 @@
           content="width=device-width, initial-scale=1.0">
 
     <title>Iniciar sesión - Moon-cars</title>
+
+    <!-- Bootstrap 5.3.3 (CSS) -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+
+    <!-- FontAwesome 6.5.2 (íconos) -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI"
+          crossorigin="anonymous">
 
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
@@ -25,14 +37,14 @@
 
             <div class="acceso-marca-texto">
 
-                <h1>Moon-cars</h1>
+                <h1><i class="fa-solid fa-car-side"></i> Moon-cars</h1>
 
                 <p>Automóviles en venta y refacciones</p>
 
-                <ul>
-                    <li>Autos nuevos y seminuevos</li>
-                    <li>Refacciones originales</li>
-                    <li>Compra fácil desde tu carrito</li>
+                <ul class="d-none d-md-block">
+                    <li><i class="fa-solid fa-car"></i> Autos nuevos y seminuevos</li>
+                    <li><i class="fa-solid fa-gears"></i> Refacciones originales</li>
+                    <li><i class="fa-solid fa-cart-shopping"></i> Compra fácil desde tu carrito</li>
                 </ul>
 
             </div>
@@ -46,9 +58,9 @@
 
             <div class="acceso-tarjeta">
 
-                <h2>Iniciar sesión</h2>
+                <h2 class="titulo-formulario">Iniciar sesión</h2>
 
-                <p class="acceso-subtitulo">
+                <p class="text-secondary mb-4">
                     Bienvenido(a). Ingresa a tu cuenta de Moon-cars.
                 </p>
 
@@ -58,89 +70,127 @@
                 {% with mensajes = get_flashed_messages(with_categories=true) %}
 
                     {% for categoria, texto in mensajes %}
-                        <p class="aviso aviso-{{ categoria }}">{{ texto }}</p>
+
+                        {% set tipo = "success" if categoria == "exito" else "danger" %}
+
+                        <div class="alert alert-{{ tipo }} d-flex align-items-center gap-2" role="alert">
+                            <i class="fa-solid {% if tipo == 'success' %}fa-circle-check{% else %}fa-triangle-exclamation{% endif %}"></i>
+                            {{ texto }}
+                        </div>
+
                     {% endfor %}
 
                 {% endwith %}
 
                 {% if mensaje %}
-                    <p class="aviso aviso-error">{{ mensaje }}</p>
+                    <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation"></i> {{ mensaje }}
+                    </div>
                 {% endif %}
 
 
-                <form method="POST" action="{{ url_for('login') }}">
+                <form method="POST" action="{{ url_for('login') }}" id="formAcceso" novalidate>
 
-                    <label for="correo">
-                        Correo electrónico:
-                    </label>
+                    <div class="mb-3">
 
-                    <input
-                        type="email"
-                        id="correo"
-                        name="correo"
-                        value="{{ correo }}"
-                        placeholder="ejemplo@correo.com"
-                        autocomplete="email"
-                        required
-                        {% if not correo %}autofocus{% endif %}
-                    >
+                        <label for="correo" class="form-label fw-bold">
+                            Correo electrónico:
+                        </label>
 
-                    <label for="password">
-                        Contraseña:
-                    </label>
+                        <div class="input-group input-group-lg has-validation">
 
-                    <div class="campo-password">
+                            <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
 
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            placeholder="Escribe tu contraseña"
-                            autocomplete="current-password"
-                            required
-                            {% if correo %}autofocus{% endif %}
-                        >
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="correo"
+                                name="correo"
+                                value="{{ correo }}"
+                                placeholder="ejemplo@correo.com"
+                                autocomplete="email"
+                                required
+                                {% if not correo %}autofocus{% endif %}
+                            >
 
-                        <button
-                            type="button"
-                            class="ver-password"
-                            id="verPassword"
-                            aria-label="Mostrar contraseña"
-                        >
-                            Mostrar
-                        </button>
+                            <div class="invalid-feedback">Escribe un correo válido.</div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label for="password" class="form-label fw-bold">
+                            Contraseña:
+                        </label>
+
+                        <div class="input-group input-group-lg has-validation">
+
+                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+
+                            <input
+                                type="password"
+                                class="form-control"
+                                id="password"
+                                name="password"
+                                placeholder="Escribe tu contraseña"
+                                autocomplete="current-password"
+                                required
+                                {% if correo %}autofocus{% endif %}
+                            >
+
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary"
+                                id="verPassword"
+                                aria-label="Mostrar contraseña"
+                                title="Mostrar contraseña"
+                            >
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+
+                            <div class="invalid-feedback">Escribe tu contraseña.</div>
+
+                        </div>
 
                     </div>
 
 
-                    <label class="recordarme">
+                    <div class="form-check mb-4">
 
                         <input
+                            class="form-check-input"
                             type="checkbox"
+                            id="recordar"
                             name="recordar"
                             {% if recordar %}checked{% endif %}
                         >
 
-                        Recordarme en este equipo
+                        <label class="form-check-label" for="recordar">
+                            Recordarme en este equipo
+                        </label>
 
-                    </label>
+                    </div>
 
 
-                    <button type="submit" class="boton boton-acceso">
-                        Iniciar sesión
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fa-solid fa-right-to-bracket"></i> Iniciar sesión
                     </button>
 
                 </form>
 
 
-                <p class="acceso-registro">
+                <p class="text-center text-secondary mt-4 mb-2">
                     ¿No tienes una cuenta?
-                    <a href="{{ url_for('formulario') }}">Regístrate</a>
+                    <a href="{{ url_for('formulario') }}" class="fw-bold">Regístrate</a>
                 </p>
 
-                <a href="{{ url_for('invitado') }}" class="acceso-invitado">
-                    Continuar sin iniciar sesión →
-                </a>
+                <p class="text-center mb-0">
+                    <a href="{{ url_for('invitado') }}" class="link-secondary small">
+                        Continuar sin iniciar sesión <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </p>
 
             </div>
 
@@ -150,6 +200,22 @@
 
 
 <script>
+
+// Validación visual de Bootstrap: campos vacíos o correo mal escrito en rojo
+const formAcceso = document.getElementById("formAcceso");
+
+formAcceso.addEventListener("submit", function(event) {
+
+    if (!formAcceso.checkValidity()) {
+
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    formAcceso.classList.add("was-validated");
+
+});
+
 
 // Mostrar / ocultar la contraseña
 const campoPassword = document.getElementById("password");
@@ -161,7 +227,9 @@ botonVer.addEventListener("click", function() {
 
     campoPassword.type = oculta ? "text" : "password";
 
-    botonVer.textContent = oculta ? "Ocultar" : "Mostrar";
+    botonVer.innerHTML = oculta
+        ? '<i class="fa-solid fa-eye-slash"></i>'
+        : '<i class="fa-solid fa-eye"></i>';
 
     botonVer.setAttribute(
         "aria-label",

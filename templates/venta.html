@@ -6,99 +6,120 @@
 
     <!-- TICKET DE VENTA -->
 
-    <section class="ticket">
+    <section class="card tarjeta-mc ticket mx-auto">
 
-        <div class="ticket-encabezado">
+        <div class="card-body p-4 p-md-5">
 
-            <div>
-                <h2>Venta #{{ venta.id }}</h2>
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
 
-                <p class="ticket-fecha">
-                    {{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}
-                </p>
+                <div>
+                    <h2 class="titulo-seccion mb-1">
+                        <i class="fa-solid fa-receipt"></i> Venta #{{ venta.id }}
+                    </h2>
+
+                    <p class="text-secondary mb-0">
+                        <i class="fa-regular fa-calendar"></i>
+                        {{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}
+                    </p>
+                </div>
+
+                <span class="badge text-bg-danger fs-6">
+                    {% if venta.vendedor %}
+                        <i class="fa-solid fa-store"></i> Venta en mostrador
+                    {% else %}
+                        <i class="fa-solid fa-globe"></i> Compra en línea
+                    {% endif %}
+                </span>
+
             </div>
 
-            <span class="etiqueta">
-                {% if venta.vendedor %}Venta en mostrador{% else %}Compra en línea{% endif %}
-            </span>
 
-        </div>
+            <!-- DATOS DE LA VENTA -->
 
+            <div class="ticket-datos mb-3">
 
-        <!-- DATOS DE LA VENTA -->
+                <p class="mb-1">
+                    <i class="fa-solid fa-user"></i>
+                    <strong>Cliente:</strong>
+                    {% if venta.cliente %}
+                        {{ venta.cliente }} ({{ venta.cliente_correo }})
+                    {% else %}
+                        Público en general
+                    {% endif %}
+                </p>
 
-        <div class="ticket-datos">
-
-            <p>
-                <strong>Cliente:</strong>
-                {% if venta.cliente %}
-                    {{ venta.cliente }} ({{ venta.cliente_correo }})
-                {% else %}
-                    Público en general
+                {% if venta.vendedor %}
+                    <p class="mb-0">
+                        <i class="fa-solid fa-user-tie"></i>
+                        <strong>Atendió:</strong> {{ venta.vendedor }}
+                    </p>
                 {% endif %}
+
+            </div>
+
+
+            <!-- PRODUCTOS -->
+
+            <table class="table table-dark align-middle tabla-mc tabla-ticket">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Producto</th>
+
+                        <th class="text-center">Cantidad</th>
+
+                        <th class="text-end">Precio</th>
+
+                        <th class="text-end">Subtotal</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for linea in detalle %}
+
+                        <tr>
+
+                            <td data-label="Producto">
+                                {{ linea.nombre }}
+                                <span class="text-secondary small marca">{{ linea.marca }}</span>
+                            </td>
+
+                            <td data-label="Cantidad" class="text-center">{{ linea.cantidad }}</td>
+
+                            <td data-label="Precio" class="text-end">{{ linea.precio_unitario | moneda }}</td>
+
+                            <td data-label="Subtotal" class="text-end">{{ linea.subtotal | moneda }}</td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+
+            <p class="ticket-total text-end">
+                Total: <strong>{{ venta.total | moneda }}</strong>
             </p>
 
-            {% if venta.vendedor %}
-                <p>
-                    <strong>Atendió:</strong> {{ venta.vendedor }}
-                </p>
-            {% endif %}
 
-        </div>
+            <div class="d-flex flex-wrap justify-content-end gap-2 ticket-acciones">
 
+                <button type="button" class="btn btn-outline-light" onclick="window.print()">
+                    <i class="fa-solid fa-print"></i> Imprimir ticket
+                </button>
 
-        <!-- PRODUCTOS -->
+                <a href="{{ url_for('catalogo') }}" class="btn btn-primary">
+                    <i class="fa-solid fa-car"></i> Seguir comprando
+                </a>
 
-        <table class="tabla-ticket">
-
-            <tr>
-
-                <th>Producto</th>
-
-                <th>Cantidad</th>
-
-                <th>Precio</th>
-
-                <th>Subtotal</th>
-
-            </tr>
-
-            {% for linea in detalle %}
-
-                <tr>
-
-                    <td data-label="Producto">
-                        {{ linea.nombre }}
-                        <span class="marca">{{ linea.marca }}</span>
-                    </td>
-
-                    <td data-label="Cantidad">{{ linea.cantidad }}</td>
-
-                    <td data-label="Precio">{{ linea.precio_unitario | moneda }}</td>
-
-                    <td data-label="Subtotal">{{ linea.subtotal | moneda }}</td>
-
-                </tr>
-
-            {% endfor %}
-
-        </table>
-
-
-        <p class="ticket-total">
-            Total: <strong>{{ venta.total | moneda }}</strong>
-        </p>
-
-
-        <div class="ticket-acciones">
-
-            <button type="button" class="boton-chico" onclick="window.print()">
-                Imprimir ticket
-            </button>
-
-            <a href="{{ url_for('catalogo') }}" class="boton">
-                Seguir comprando
-            </a>
+            </div>
 
         </div>
 

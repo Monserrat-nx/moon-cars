@@ -6,51 +6,62 @@
 
     <!-- PERFIL -->
 
-    <div class="perfil">
+    <div class="card tarjeta-mc tarjeta-centrada text-center">
 
-        <h2>Mi Perfil</h2>
+        <div class="card-body p-4 p-md-5">
+
+            <div class="perfil-avatar mx-auto mb-3">
+                {{ usuario.nombre[:1] | upper }}
+            </div>
+
+            <h2 class="perfil-nombre">{{ usuario.nombre }}</h2>
+
+            <span class="badge rounded-pill text-bg-danger mb-3">{{ usuario.rol }}</span>
+
+            <ul class="list-group list-group-flush text-start my-3">
+
+                <li class="list-group-item bg-transparent">
+                    <i class="fa-solid fa-envelope text-danger"></i>
+                    <strong>Correo:</strong> {{ usuario.correo }}
+                </li>
+
+                <li class="list-group-item bg-transparent">
+                    <i class="fa-regular fa-calendar text-danger"></i>
+                    <strong>Miembro desde:</strong> {{ usuario.fecha_registro.strftime('%d/%m/%Y') }}
+                </li>
+
+            </ul>
 
 
-        <h3>{{ usuario.nombre }}</h3>
+            <!-- OPCIONES SEGÚN EL ROL -->
 
-        <span class="etiqueta etiqueta-rol">{{ usuario.rol }}</span>
+            <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
 
-        <p>
-            Correo: {{ usuario.correo }}
-        </p>
-
-        <p>
-            Miembro desde: {{ usuario.fecha_registro.strftime('%d/%m/%Y') }}
-        </p>
-
-
-        <!-- OPCIONES SEGÚN EL ROL -->
-
-        <div class="perfil-acciones">
-
-            <a href="{{ url_for('catalogo') }}" class="boton">
-                Ver catálogo
-            </a>
-
-            {% if usuario.rol == "Administrador" %}
-                <a href="{{ url_for('agregar_producto') }}" class="boton">
-                    Agregar producto
+                <a href="{{ url_for('catalogo') }}" class="btn btn-primary">
+                    <i class="fa-solid fa-car"></i> Ver catálogo
                 </a>
-            {% endif %}
 
-            {% if es_personal %}
-                <a href="{{ url_for('ventas') }}" class="boton">
-                    Ver ventas
-                </a>
-            {% else %}
-                <a href="{{ url_for('mis_compras') }}" class="boton">
-                    Mis compras
-                </a>
-            {% endif %}
+                {% if usuario.rol == "Administrador" %}
+                    <a href="{{ url_for('agregar_producto') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-plus"></i> Agregar producto
+                    </a>
+                {% endif %}
 
-            <a href="{{ url_for('logout') }}" class="boton-eliminar">
-                Cerrar sesión
-            </a>
+                {% if es_personal %}
+                    <a href="{{ url_for('ventas') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-chart-line"></i> Ver ventas
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('mis_compras') }}" class="btn btn-primary">
+                        <i class="fa-solid fa-bag-shopping"></i> Mis compras
+                    </a>
+                {% endif %}
+
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-primary">
+                    <i class="fa-solid fa-right-from-bracket"></i> Cerrar sesión
+                </a>
+
+            </div>
 
         </div>
 
