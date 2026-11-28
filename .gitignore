@@ -23,3 +23,9 @@ __pycache__/
 .idea/
 Thumbs.db
 desktop.ini
+
+# =========================
+# GUÍA DE TRABAJO LOCAL (no se sube)
+# =========================
+CLAUDE.md
+.claude/
