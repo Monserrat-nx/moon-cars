@@ -1528,8 +1528,39 @@ def archivo_muy_grande(error):
 
 
 # =========================
+# PÁGINAS DE ERROR
+# =========================
+
+@app.errorhandler(404)
+def pagina_no_encontrada(error):
+
+    return render_template(
+        "error.html",
+        codigo=404,
+        icono="fa-car-burst",
+        titulo_error="Página no encontrada",
+        mensaje="La página que buscas no existe o se movió de lugar."
+    ), 404
+
+
+@app.errorhandler(500)
+def error_del_servidor(error):
+
+    print("Error interno del servidor:", error)
+
+    return render_template(
+        "error.html",
+        codigo=500,
+        icono="fa-screwdriver-wrench",
+        titulo_error="Error del servidor",
+        mensaje="Algo salió mal de nuestro lado. Intenta de nuevo en unos minutos."
+    ), 500
+
+
+# =========================
 # SERVIDOR
 # =========================
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=8080, debug=True)
+    # debug=False: con debug=True Flask enseña su depurador en lugar de la página 500
+    app.run(host="0.0.0.0", port=8080, debug=False)
