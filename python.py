@@ -28,6 +28,10 @@ database=MySQL(app)
 # INICIO
 # =========================
 
+# Cuántos productos se muestran por categoría en el inicio
+PRODUCTOS_POR_SECCION = 5
+
+
 @app.route("/")
 def inicio():
 
@@ -36,7 +40,59 @@ def inicio():
     if "usuario_id" not in session and not session.get("invitado"):
         return redirect(url_for("login"))
 
-    return render_template("Proyecto.html")
+    # Productos destacados por categoría, sacados de la BD
+    secciones = []
+
+    try:
+        cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        cursor.execute(
+            """
+            SELECT p.id, p.nombre, p.marca, p.precio, p.stock,
+                   p.imagen, p.imagen_tipo,
+                   c.id AS categoria_id, c.nombre AS categoria
+            FROM productos p
+            INNER JOIN categorias c ON c.id = p.categoria_id
+            WHERE p.stock > 0
+            ORDER BY c.nombre, p.id DESC
+            """
+        )
+
+        productos = cursor.fetchall()
+
+        cursor.close()
+
+    except MySQLdb.Error as error:
+        print("Error al cargar el inicio:", error)
+
+        flash("No se pudieron cargar los productos destacados.", "error")
+
+        productos = []
+
+    # Agrupar por categoría (máximo PRODUCTOS_POR_SECCION en cada una)
+    for producto in productos:
+
+        if not secciones or secciones[-1]["id"] != producto["categoria_id"]:
+            secciones.append({
+                "id": producto["categoria_id"],
+                "nombre": producto["categoria"],
+                "productos": []
+            })
+
+        if len(secciones[-1]["productos"]) < PRODUCTOS_POR_SECCION:
+
+            producto["imagen_base64"] = imagen_a_base64(
+                producto["imagen"],
+                producto["imagen_tipo"]
+            )
+
+            secciones[-1]["productos"].append(producto)
+
+    return render_template(
+        "Proyecto.html",
+        secciones=secciones
+    )
+
 
 
 # =========================
