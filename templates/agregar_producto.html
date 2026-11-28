@@ -1,17 +1,22 @@
 {% extends "plantilla.html" %}
 
-{% block titulo %}Agregar producto - Moon-cars{% endblock %}
+{% block titulo %}{% if producto %}Editar producto{% else %}Agregar producto{% endif %} - Moon-cars{% endblock %}
 
 {% block contenido %}
 
-    <!-- AGREGAR PRODUCTO -->
+    <!-- AGREGAR / EDITAR PRODUCTO -->
+    <!-- Si llega "producto" la página edita ese producto; si no, agrega uno nuevo -->
 
     <div class="card tarjeta-mc tarjeta-formulario tarjeta-formulario-ancha">
 
         <div class="card-body p-4 p-md-5">
 
             <h2 class="text-center titulo-formulario">
-                <i class="fa-solid fa-box-open"></i> Agregar producto
+                {% if producto %}
+                    <i class="fa-solid fa-pen-to-square"></i> Editar producto
+                {% else %}
+                    <i class="fa-solid fa-box-open"></i> Agregar producto
+                {% endif %}
             </h2>
 
 
@@ -177,29 +182,50 @@
 
                     <div class="invalid-feedback">La imagen debe pesar máximo 2 MB.</div>
 
+                    {% if producto %}
+                        <div class="form-text">
+                            Si no eliges una imagen nueva, se queda la actual.
+                        </div>
+                    {% endif %}
+
                 </div>
 
 
                 <!-- VISTA PREVIA DE LA IMAGEN -->
 
                 <div class="vista-previa" id="vistaPrevia">
-                    <span class="sin-imagen">
-                        <i class="fa-regular fa-image fa-2x"></i><br>Sin imagen seleccionada
-                    </span>
+
+                    {% if producto and producto.imagen_base64 %}
+                        <img src="{{ producto.imagen_base64 }}" alt="Imagen actual de {{ producto.nombre }}">
+                    {% else %}
+                        <span class="sin-imagen">
+                            <i class="fa-regular fa-image fa-2x"></i><br>Sin imagen seleccionada
+                        </span>
+                    {% endif %}
+
                 </div>
 
 
                 <button type="submit" class="btn btn-primary w-100 py-2 mt-4">
-                    <i class="fa-solid fa-floppy-disk"></i> Guardar producto
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    {% if producto %}Guardar cambios{% else %}Guardar producto{% endif %}
                 </button>
 
             </form>
 
 
             <p class="text-center mt-4 mb-0">
-                <a href="{{ url_for('catalogo') }}">
-                    <i class="fa-solid fa-arrow-left"></i> Volver al catálogo
-                </a>
+
+                {% if producto %}
+                    <a href="{{ url_for('producto', producto_id=producto.id) }}">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al producto
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('catalogo') }}">
+                        <i class="fa-solid fa-arrow-left"></i> Volver al catálogo
+                    </a>
+                {% endif %}
+
             </p>
 
         </div>
@@ -218,7 +244,8 @@ const vistaPrevia = document.getElementById("vistaPrevia");
 
 const TAMANO_MAXIMO = 2 * 1024 * 1024;
 
-const SIN_IMAGEN = '<span class="sin-imagen"><i class="fa-regular fa-image fa-2x"></i><br>Sin imagen seleccionada</span>';
+// Lo que se ve al inicio: la imagen actual (al editar) o el aviso "Sin imagen"
+const SIN_IMAGEN = vistaPrevia.innerHTML;
 
 
 // Mostrar la imagen antes de subirla

@@ -1145,6 +1145,83 @@ def obtener_categorias():
     return categorias
 
 
+def validar_producto(categorias):
+    """Lee y valida los datos del formulario de producto (agregar y editar).
+    Regresa (datos, errores): datos trae los valores ya limpios
+    y errores es la lista de mensajes para el usuario."""
+
+    nombre = request.form.get("nombre", "").strip()
+    marca = request.form.get("marca", "").strip()
+    descripcion = request.form.get("descripcion", "").strip()
+    precio_texto = request.form.get("precio", "").strip()
+    stock_texto = request.form.get("stock", "").strip()
+    categoria_texto = request.form.get("categoria_id", "").strip()
+    archivo = request.files.get("imagen")
+
+    errores = []
+
+    precio = None
+    stock = None
+
+    # Validar textos
+    if not nombre or len(nombre) > 100:
+        errores.append("El nombre es obligatorio (máximo 100 caracteres).")
+
+    if not marca or len(marca) > 60:
+        errores.append("La marca es obligatoria (máximo 60 caracteres).")
+
+    # Validar precio
+    try:
+        precio = round(float(precio_texto), 2)
+
+        if precio < 0 or precio > 99999999.99:
+            raise ValueError
+
+    except ValueError:
+        errores.append("El precio debe ser un número mayor o igual a 0.")
+
+    # Validar stock
+    try:
+        stock = int(stock_texto)
+
+        if stock < 0:
+            raise ValueError
+
+    except ValueError:
+        errores.append("El stock debe ser un número entero mayor o igual a 0.")
+
+    # Validar categoría (que exista en la BD)
+    ids_categorias = {str(categoria["id"]) for categoria in categorias}
+
+    if categoria_texto not in ids_categorias:
+        errores.append("Selecciona una categoría válida.")
+
+    # Validar imagen (opcional)
+    imagen = None
+    imagen_tipo = None
+
+    if archivo and archivo.filename:
+
+        imagen = archivo.read()
+        imagen_tipo = detectar_tipo_imagen(imagen)
+
+        if not imagen_tipo:
+            errores.append("La imagen debe ser JPG, PNG, GIF o WEBP.")
+
+    datos = {
+        "nombre": nombre,
+        "marca": marca,
+        "descripcion": descripcion or None,
+        "precio": precio,
+        "stock": stock,
+        "imagen": imagen,
+        "imagen_tipo": imagen_tipo,
+        "categoria_id": int(categoria_texto) if categoria_texto.isdigit() else None
+    }
+
+    return datos, errores
+
+
 @app.route("/productos/agregar", methods=["GET", "POST"])
 @rol_requerido(ROL_ADMINISTRADOR)
 def agregar_producto():
@@ -1161,60 +1238,7 @@ def agregar_producto():
 
     if request.method == "POST":
 
-        nombre = request.form.get("nombre", "").strip()
-        marca = request.form.get("marca", "").strip()
-        descripcion = request.form.get("descripcion", "").strip()
-        precio_texto = request.form.get("precio", "").strip()
-        stock_texto = request.form.get("stock", "").strip()
-        categoria_texto = request.form.get("categoria_id", "").strip()
-        archivo = request.files.get("imagen")
-
-        errores = []
-
-        # Validar textos
-        if not nombre or len(nombre) > 100:
-            errores.append("El nombre es obligatorio (máximo 100 caracteres).")
-
-        if not marca or len(marca) > 60:
-            errores.append("La marca es obligatoria (máximo 60 caracteres).")
-
-        # Validar precio
-        try:
-            precio = round(float(precio_texto), 2)
-
-            if precio < 0 or precio > 99999999.99:
-                raise ValueError
-
-        except ValueError:
-            errores.append("El precio debe ser un número mayor o igual a 0.")
-
-        # Validar stock
-        try:
-            stock = int(stock_texto)
-
-            if stock < 0:
-                raise ValueError
-
-        except ValueError:
-            errores.append("El stock debe ser un número entero mayor o igual a 0.")
-
-        # Validar categoría (que exista en la BD)
-        ids_categorias = {str(categoria["id"]) for categoria in categorias}
-
-        if categoria_texto not in ids_categorias:
-            errores.append("Selecciona una categoría válida.")
-
-        # Validar imagen (opcional)
-        imagen = None
-        imagen_tipo = None
-
-        if archivo and archivo.filename:
-
-            imagen = archivo.read()
-            imagen_tipo = detectar_tipo_imagen(imagen)
-
-            if not imagen_tipo:
-                errores.append("La imagen debe ser JPG, PNG, GIF o WEBP.")
+        datos, errores = validar_producto(categorias)
 
         if errores:
 
@@ -1224,7 +1248,8 @@ def agregar_producto():
             return render_template(
                 "agregar_producto.html",
                 categorias=categorias,
-                datos=request.form
+                datos=request.form,
+                producto=None
             )
 
         # Guardar producto en MariaDB
@@ -1239,14 +1264,14 @@ def agregar_producto():
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """,
                 (
-                    nombre,
-                    marca,
-                    descripcion or None,
-                    precio,
-                    stock,
-                    imagen,
-                    imagen_tipo,
-                    int(categoria_texto)
+                    datos["nombre"],
+                    datos["marca"],
+                    datos["descripcion"],
+                    datos["precio"],
+                    datos["stock"],
+                    datos["imagen"],
+                    datos["imagen_tipo"],
+                    datos["categoria_id"]
                 )
             )
 
@@ -1266,18 +1291,230 @@ def agregar_producto():
             return render_template(
                 "agregar_producto.html",
                 categorias=categorias,
-                datos=request.form
+                datos=request.form,
+                producto=None
             )
 
-        flash(f"Producto \"{nombre}\" agregado correctamente.", "exito")
+        flash(f"Producto \"{datos['nombre']}\" agregado correctamente.", "exito")
 
         return redirect(url_for("producto", producto_id=nuevo_id))
 
     return render_template(
         "agregar_producto.html",
         categorias=categorias,
-        datos={}
+        datos={},
+        producto=None
     )
+
+
+# =========================
+# EDITAR PRODUCTO
+# =========================
+
+@app.route("/productos/<int:producto_id>/editar", methods=["GET", "POST"])
+@rol_requerido(ROL_ADMINISTRADOR)
+def editar_producto(producto_id):
+
+    # Cargar categorías y el producto actual
+    try:
+        categorias = obtener_categorias()
+
+        cursor = database.connection.cursor(MySQLdb.cursors.DictCursor)
+
+        cursor.execute(
+            """
+            SELECT id, nombre, marca, descripcion, precio, stock,
+                   imagen, imagen_tipo, categoria_id
+            FROM productos
+            WHERE id = %s
+            """,
+            (producto_id,)
+        )
+
+        producto_actual = cursor.fetchone()
+
+        cursor.close()
+
+    except MySQLdb.Error as error:
+        print("Error al cargar el producto a editar:", error)
+
+        flash("No se pudo conectar con la base de datos.", "error")
+
+        return redirect(url_for("catalogo"))
+
+    if not producto_actual:
+        flash("El producto que quieres editar no existe.", "error")
+
+        return redirect(url_for("catalogo"))
+
+    producto_actual["imagen_base64"] = imagen_a_base64(
+        producto_actual["imagen"],
+        producto_actual["imagen_tipo"]
+    )
+
+    if request.method == "POST":
+
+        datos, errores = validar_producto(categorias)
+
+        if errores:
+
+            for error in errores:
+                flash(error, "error")
+
+            return render_template(
+                "agregar_producto.html",
+                categorias=categorias,
+                datos=request.form,
+                producto=producto_actual
+            )
+
+        # Actualizar en MariaDB.
+        # Si no se subió imagen nueva, COALESCE deja la que ya tenía.
+        try:
+            cursor = database.connection.cursor()
+
+            cursor.execute(
+                """
+                UPDATE productos
+                SET nombre = %s,
+                    marca = %s,
+                    descripcion = %s,
+                    precio = %s,
+                    stock = %s,
+                    imagen = COALESCE(%s, imagen),
+                    imagen_tipo = COALESCE(%s, imagen_tipo),
+                    categoria_id = %s
+                WHERE id = %s
+                """,
+                (
+                    datos["nombre"],
+                    datos["marca"],
+                    datos["descripcion"],
+                    datos["precio"],
+                    datos["stock"],
+                    datos["imagen"],
+                    datos["imagen_tipo"],
+                    datos["categoria_id"],
+                    producto_id
+                )
+            )
+
+            database.connection.commit()
+
+            cursor.close()
+
+        except MySQLdb.Error as error:
+            database.connection.rollback()
+
+            print("Error al actualizar el producto:", error)
+
+            flash("No se pudo actualizar el producto. Intenta de nuevo.", "error")
+
+            return render_template(
+                "agregar_producto.html",
+                categorias=categorias,
+                datos=request.form,
+                producto=producto_actual
+            )
+
+        flash(f"Producto \"{datos['nombre']}\" actualizado correctamente.", "exito")
+
+        return redirect(url_for("producto", producto_id=producto_id))
+
+    # GET: el formulario aparece lleno con los datos actuales
+    datos_iniciales = {
+        "nombre": producto_actual["nombre"],
+        "marca": producto_actual["marca"],
+        "descripcion": producto_actual["descripcion"] or "",
+        "precio": str(producto_actual["precio"]),
+        "stock": str(producto_actual["stock"]),
+        "categoria_id": str(producto_actual["categoria_id"])
+    }
+
+    return render_template(
+        "agregar_producto.html",
+        categorias=categorias,
+        datos=datos_iniciales,
+        producto=producto_actual
+    )
+
+
+# =========================
+# ELIMINAR PRODUCTO
+# =========================
+
+# Código de MariaDB cuando una llave foránea impide borrar (ON DELETE RESTRICT)
+ERROR_LLAVE_FORANEA = 1451
+
+
+@app.route("/productos/<int:producto_id>/eliminar", methods=["POST"])
+@rol_requerido(ROL_ADMINISTRADOR)
+def eliminar_producto(producto_id):
+
+    try:
+        cursor = database.connection.cursor()
+
+        cursor.execute(
+            "SELECT nombre FROM productos WHERE id = %s",
+            (producto_id,)
+        )
+
+        fila = cursor.fetchone()
+
+        if not fila:
+            cursor.close()
+
+            flash("El producto que quieres eliminar no existe.", "error")
+
+            return redirect(url_for("catalogo"))
+
+        nombre = fila[0]
+
+        cursor.execute(
+            "DELETE FROM productos WHERE id = %s",
+            (producto_id,)
+        )
+
+        database.connection.commit()
+
+        cursor.close()
+
+    except MySQLdb.IntegrityError as error:
+        database.connection.rollback()
+
+        print("No se pudo eliminar el producto:", error)
+
+        # El producto aparece en tickets de venta: la BD no deja borrarlo
+        if error.args and error.args[0] == ERROR_LLAVE_FORANEA:
+            flash(
+                "No se puede eliminar porque ya aparece en ventas registradas. "
+                "Si ya no se vende, edítalo y pon su stock en 0.",
+                "error"
+            )
+
+        else:
+            flash("No se pudo eliminar el producto.", "error")
+
+        return redirect(url_for("producto", producto_id=producto_id))
+
+    except MySQLdb.Error as error:
+        database.connection.rollback()
+
+        print("Error al eliminar el producto:", error)
+
+        flash("No se pudo eliminar el producto. Intenta de nuevo.", "error")
+
+        return redirect(url_for("producto", producto_id=producto_id))
+
+    # Quitarlo también del carrito de esta sesión
+    carrito_sesion = obtener_carrito()
+
+    if carrito_sesion.pop(str(producto_id), None) is not None:
+        guardar_carrito(carrito_sesion)
+
+    flash(f"Producto \"{nombre}\" eliminado correctamente.", "exito")
+
+    return redirect(url_for("catalogo"))
 
 
 # Si suben un archivo más grande que MAX_CONTENT_LENGTH
@@ -1286,7 +1523,8 @@ def archivo_muy_grande(error):
 
     flash("La imagen es muy grande. El máximo es 2 MB.", "error")
 
-    return redirect(url_for("agregar_producto"))
+    # Regresar al mismo formulario (agregar o editar)
+    return redirect(request.path)
 
 
 # =========================
