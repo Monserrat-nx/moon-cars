@@ -143,10 +143,8 @@ Lanza 73 ataques contra las rutas de la aplicación; todos deben salir como **PA
 
 ---
 
-## Integrantes
+## Integrante
 
 | Nombre | GitHub |
 |---|---|
-| | [@Monserrat-nx](https://github.com/Monserrat-nx) |
-| | |
-| | |
+| Neylan Monserrat Márquez Urzúa | [@Monserrat-nx](https://github.com/Monserrat-nx) |
