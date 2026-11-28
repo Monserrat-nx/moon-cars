@@ -19,166 +19,112 @@
 
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-4">
 
-            <a href="{{ url_for('catalogo', categoria=1) }}" class="btn btn-primary btn-lg">
-                <i class="fa-solid fa-car"></i> Ver carros
-            </a>
+            {% for seccion in secciones %}
 
-            <a href="{{ url_for('catalogo', categoria=2) }}" class="btn btn-outline-light btn-lg">
-                <i class="fa-solid fa-gears"></i> Ver refacciones
-            </a>
+                <a href="{{ url_for('catalogo', categoria=seccion.id) }}"
+                   class="btn btn-lg {% if loop.first %}btn-primary{% else %}btn-outline-light{% endif %}">
+                    <i class="fa-solid {% if seccion.nombre == 'Carros' %}fa-car{% else %}fa-gears{% endif %}"></i>
+                    Ver {{ seccion.nombre | lower }}
+                </a>
 
-        </div>
+            {% else %}
 
-    </section>
+                <a href="{{ url_for('catalogo') }}" class="btn btn-primary btn-lg">
+                    <i class="fa-solid fa-store"></i> Ver catálogo
+                </a>
 
-
-    <!-- CARROS -->
-
-    <section class="mt-5">
-
-        <h2 class="titulo-seccion">Carros Destacados</h2>
-
-        <div class="table-responsive">
-
-            <table class="table table-dark table-hover align-middle text-center tabla-mc">
-
-                <thead>
-
-                    <tr>
-
-                        <th>Imagen</th>
-
-                        <th>Modelo</th>
-
-                        <th>Marca</th>
-
-                        <th>Precio</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <tr>
-
-                        <td>
-
-                            <img
-                                src="{{ url_for('static', filename='img/mustang.jpg') }}"
-                                class="img-fluid rounded imagen-tabla"
-                                alt="Mustang GT"
-                            >
-
-                        </td>
-
-                        <td>Mustang GT</td>
-
-                        <td>Ford</td>
-
-                        <td>$950,000</td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>
-
-                            <img
-                                src="{{ url_for('static', filename='img/jetta.jpg') }}"
-                                class="img-fluid rounded imagen-tabla"
-                                alt="Jetta GLI"
-                            >
-
-                        </td>
-
-                        <td>Jetta GLI</td>
-
-                        <td>Volkswagen</td>
-
-                        <td>$620,000</td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
+            {% endfor %}
 
         </div>
 
     </section>
 
 
-    <!-- REFACCIONES -->
+    <!-- PRODUCTOS DESTACADOS POR CATEGORÍA (desde la base de datos) -->
 
-    <section class="mt-5">
+    {% for seccion in secciones %}
 
-        <h2 class="titulo-seccion">Refacciones</h2>
+        <section class="mt-5">
 
-        <div class="table-responsive">
+            <h2 class="titulo-seccion">
+                {% if seccion.nombre == 'Carros' %}Carros destacados{% else %}{{ seccion.nombre }}{% endif %}
+            </h2>
 
-            <table class="table table-dark table-hover align-middle text-center tabla-mc">
+            <div class="table-responsive">
 
-                <thead>
+                <table class="table table-dark table-hover align-middle text-center tabla-mc">
 
-                    <tr>
+                    <thead>
 
-                        <th>Imagen</th>
+                        <tr>
 
-                        <th>Producto</th>
+                            <th>Imagen</th>
 
-                        <th>Precio</th>
+                            <th>Producto</th>
 
-                    </tr>
+                            <th>Marca</th>
 
-                </thead>
+                            <th>Precio</th>
 
-                <tbody>
+                            <th></th>
 
-                    <tr>
+                        </tr>
 
-                        <td>
+                    </thead>
 
-                            <img
-                                src="{{ url_for('static', filename='img/aceite.jpg') }}"
-                                class="img-fluid rounded imagen-tabla"
-                                alt="Aceite sintético"
-                            >
+                    <tbody>
 
-                        </td>
+                        {% for producto in seccion.productos %}
 
-                        <td>Aceite Sintético</td>
+                            <tr>
 
-                        <td>$550</td>
+                                <td data-label="Imagen">
 
-                    </tr>
+                                    {% if producto.imagen_base64 %}
+                                        <img
+                                            src="{{ producto.imagen_base64 }}"
+                                            class="img-fluid rounded imagen-tabla"
+                                            alt="{{ producto.nombre }}"
+                                        >
+                                    {% else %}
+                                        <i class="fa-regular fa-image fa-2x text-secondary"></i>
+                                    {% endif %}
 
-                    <tr>
+                                </td>
 
-                        <td><i class="fa-solid fa-circle-notch text-secondary"></i></td>
+                                <td data-label="Producto">{{ producto.nombre }}</td>
 
-                        <td>Llanta Michelin</td>
+                                <td data-label="Marca">{{ producto.marca }}</td>
 
-                        <td>$3,200</td>
+                                <td data-label="Precio">{{ producto.precio | moneda }}</td>
 
-                    </tr>
+                                <td data-label="">
 
-                    <tr>
+                                    <a href="{{ url_for('producto', producto_id=producto.id) }}"
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fa-solid fa-eye"></i> Ver
+                                    </a>
 
-                        <td><i class="fa-solid fa-car-battery text-secondary"></i></td>
+                                </td>
 
-                        <td>Batería LTH</td>
+                            </tr>
 
-                        <td>$2,100</td>
+                        {% endfor %}
 
-                    </tr>
+                    </tbody>
 
-                </tbody>
+                </table>
 
-            </table>
+            </div>
 
-        </div>
+        </section>
 
-    </section>
+    {% else %}
+
+        <p class="text-secondary text-center mt-5">
+            <i class="fa-regular fa-folder-open"></i> Por ahora no hay productos disponibles.
+        </p>
+
+    {% endfor %}
 
 {% endblock %}
